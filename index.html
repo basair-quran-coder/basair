@@ -29,7 +29,7 @@
       .page-one .mushaf-line { font-size: clamp(1.35rem, 2.9vw, 2.3rem); }
     }
     @media (max-width: 1180px) {
-      .mushaf { width: min(calc(100vw - 32px), 900px); }
+      .mushaf { width: min(calc(100vw - 32px), calc((100svh - 150px)*.651), 900px); }
     }
     .controls .quran-search-btn { display: flex; align-items: center; gap: 10px; padding-inline: 15px; text-align: right; border-color: rgba(173,129,52,.5); background: rgba(255,255,255,.9); box-shadow: inset 0 0 0 1px rgba(255,255,255,.45), 0 3px 12px rgba(23,77,62,.06); }
     .quran-search-btn .search-launch-icon { display: inline-grid; place-items: center; flex: 0 0 auto; color: var(--green); font-size: 1.25rem; font-weight: 700; }
