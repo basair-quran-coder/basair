@@ -101,7 +101,7 @@ function pageHtml(data,font,useGlyphs=true,page=state.page){
     html+=`<div class="mushaf-line${centered?' centered':''}" style="grid-row:${line};font-family:${useGlyphs?`'${font}'`:'UthmanicHafs,AmiriQuran'}">`;
     for(const w of words){
       const end=w.char_type_name==='end',qcf=useGlyphs,text=qcf?(w.code_v2||''):(w.text_qpc_hafs||w.text||'');
-      html+=`<span class="word ${end?'end':''}" data-surah="${w.surah}" data-verse="${w.verse}" style="font-family:${qcf?`'${font}'`:'UthmanicHafs,AmiriQuran'}">${text}${end?marker(w.surah,w.verse):''}</span>`;
+      html+=`<span class="word ${end?'end':''}" data-surah="${w.surah}" data-verse="${w.verse}" style="font-family:${qcf?`'${font}'`:'UthmanicHafs,AmiriQuran'}"><span class="${qcf?'qpc-glyph':''}">${text}</span>${end?marker(w.surah,w.verse):''}</span>`;
     }
     html+='</div>';
   };
