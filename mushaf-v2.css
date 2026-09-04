@@ -50,6 +50,7 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
   .mushaf{display:block!important;width:100%!important;max-width:none;margin:0;box-shadow:0 20px 55px rgba(23,51,43,.15)}
   #mushaf{grid-column:1;border-radius:0 14px 14px 0}
   #mushafSecond{grid-column:2;border-radius:14px 0 0 14px}
+  #edgeNext{display:none}
   #mushaf::after{content:"";position:absolute;z-index:9;left:-1px;top:10px;bottom:10px;width:10px;background:linear-gradient(90deg,rgba(40,30,15,.12),transparent);pointer-events:none}
   #mushafSecond::after{content:"";position:absolute;z-index:9;right:-1px;top:10px;bottom:10px;width:10px;background:linear-gradient(-90deg,rgba(40,30,15,.12),transparent);pointer-events:none}
   .zoom-controls{display:none!important}
