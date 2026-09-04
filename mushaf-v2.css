@@ -19,7 +19,6 @@ body.night{--outside:#0b1915;--paper:#1a2b25;--ink:#e9eee9;--muted:#a6b4ae;--gre
 .mushaf.opening-page .corner::after{content:"◆";inset:0;width:auto;height:auto;display:grid;place-items:center;border:0;background:transparent;color:var(--green);transform:none;font-size:7px;opacity:1}
 .mushaf.opening-page .ornament{width:76px;height:28px;border:2px solid #c6983c;border-radius:50%;opacity:1;background:radial-gradient(circle,#17654f 0 3px,#f4dfa5 4px 7px,transparent 8px),repeating-conic-gradient(from 45deg,#c99d43 0 7deg,transparent 7deg 15deg,#17654f 15deg 20deg,transparent 20deg 22.5deg);box-shadow:inset 0 0 0 5px var(--paper),0 0 0 2px rgba(23,101,79,.62)}
 .mushaf.opening-page .cartouche{width:84%;border:2px solid #c29338;border-radius:50%/34%;outline:2px solid rgba(23,101,79,.55);outline-offset:-6px;background:radial-gradient(circle at 7% 50%,#17654f 0 3px,#e6cc86 4px 8px,transparent 9px),radial-gradient(circle at 93% 50%,#17654f 0 3px,#e6cc86 4px 8px,transparent 9px),linear-gradient(90deg,#f8edca,rgba(255,253,244,.92) 25%,rgba(211,177,91,.2) 50%,rgba(255,253,244,.92) 75%,#f8edca);box-shadow:0 3px 12px rgba(72,52,10,.14),inset 0 0 14px rgba(190,143,42,.13)}
-.mushaf-line[style*="grid-row:15"]{transform:translateY(clamp(-12px,-1vw,-6px))}
 .mushaf.page-one .mushaf-body{background:radial-gradient(circle at 50% 48%,rgba(200,157,67,.11),transparent 33%),radial-gradient(circle at 50% 62%,rgba(23,101,79,.07),transparent 30%)}
 body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94),0 0 0 14px #4e947d,0 0 0 16px #d2aa50,inset 0 0 0 10px rgba(24,48,39,.94),inset 0 0 0 12px rgba(211,169,77,.9)}
 @media(max-width:560px){.mushaf.opening-page::before{inset:27px 18px 36px;outline-offset:4px;box-shadow:0 0 0 7px rgba(251,246,226,.92),0 0 0 9px #17654f,0 0 0 11px #d2aa50,inset 0 0 0 7px rgba(255,253,242,.94),inset 0 0 0 9px rgba(177,130,40,.9);background-size:100% 9px,100% 9px,9px 100%,9px 100%}.mushaf.opening-page::after{top:22px;width:42px;height:21px;font-size:10px}.mushaf.opening-page .corner{width:35px;height:35px;box-shadow:0 0 0 1px #c29438,0 0 0 3px #fffaf0,inset 0 0 0 4px #fffaf0}.mushaf.opening-page .ornament{width:58px;height:22px}}
@@ -65,3 +64,24 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
   .mushaf-foot{right:15px;left:15px;bottom:12px}
   .panel{top:58px!important;width:100%!important;border-radius:18px 0 0!important}
 }
+
+/* نافذة التعريف ببرنامج بصائر */
+.brand{border:0;background:transparent;text-align:right;padding:0;cursor:pointer;border-radius:12px}
+.brand:hover,.brand:focus-visible{background:rgba(173,129,52,.08);outline:2px solid transparent}
+.about-overlay{position:fixed;z-index:88;inset:0;display:grid;place-items:center;padding:16px;background:rgba(5,25,19,.6);opacity:0;visibility:hidden;transition:.2s;backdrop-filter:blur(6px)}
+.about-overlay.open{opacity:1;visibility:visible}
+.about-dialog{width:min(640px,100%);max-height:min(820px,92vh);overflow:hidden;display:flex;flex-direction:column;border:1px solid rgba(173,129,52,.44);border-radius:24px;background:var(--panel);box-shadow:0 28px 90px rgba(0,0,0,.32);font-family:var(--qa)}
+.about-dialog>header{display:flex;align-items:center;gap:14px;padding:17px 20px 13px;border-bottom:1px solid var(--line);background:radial-gradient(circle at 100% 0,rgba(173,129,52,.14),transparent 240px)}
+.about-dialog>header div{display:grid}.about-dialog>header span{color:var(--gold);font-size:.7rem;font-weight:700}.about-dialog h2{margin:2px 0 0;color:var(--green);font-size:1.3rem}
+.about-content{overflow:auto;display:grid;justify-items:center;gap:15px;padding:24px 25px 25px;text-align:center}
+.about-emblem{width:72px;height:72px;display:grid;place-items:center;border:2px solid var(--gold);border-radius:50%;background:radial-gradient(circle,#fffdf5 0 54%,rgba(173,129,52,.14) 55% 100%);color:var(--green);font:700 2rem var(--ui);box-shadow:0 8px 25px rgba(23,77,62,.12)}
+.about-lead{max-width:540px;margin:0;color:var(--ink);font-size:1rem;line-height:1.95}
+.about-stat{width:100%;margin:0;padding:12px 15px;border:1px solid rgba(173,129,52,.32);border-radius:13px;background:rgba(173,129,52,.08);color:var(--green);font-size:.88rem;font-weight:700;line-height:1.85;text-align:right}
+.about-method{width:100%;display:grid;gap:11px;text-align:right}.about-method h3{margin:2px 0;color:var(--green);font-size:1.08rem}.about-method p{margin:0;color:var(--ink);font-size:.86rem;line-height:1.95}.about-method .about-questions{padding:12px 14px;border-inline-start:3px solid var(--gold);border-radius:9px;background:color-mix(in srgb,var(--paper) 72%,transparent);color:var(--green)}
+.about-features{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;text-align:right}
+.about-features>div{display:grid;gap:4px;padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--paper) 70%,transparent)}
+.about-features b{color:var(--green);font-size:.92rem}.about-features span{color:var(--muted);font-size:.79rem;line-height:1.75}
+.about-note{margin:0;padding:11px 14px;border-inline-start:3px solid var(--gold);border-radius:9px;background:rgba(173,129,52,.08);color:var(--muted);font-size:.78rem;line-height:1.8;text-align:right}
+.about-action{width:100%;min-height:48px;border:0;border-radius:13px;background:var(--green);color:white;font:700 .94rem var(--qa)}
+body.night .about-features>div{background:rgba(25,48,39,.72)}
+@media(max-width:560px){.about-overlay{align-items:end;padding:0}.about-dialog{width:100%;max-height:92vh;border-radius:24px 24px 0 0;padding-bottom:env(safe-area-inset-bottom)}.about-content{padding:20px 17px}.about-features{grid-template-columns:1fr}.about-emblem{width:62px;height:62px;font-size:1.75rem}}

@@ -280,7 +280,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><b>ب</b><span><strong>بصائر</strong><small>تساؤلات في البيان القرآني</small></span></div>
+    <button class="brand" id="aboutBtn" type="button" aria-label="التعريف ببرنامج بصائر" title="عن بصائر"><b>ب</b><span><strong>بصائر</strong><small>تساؤلات في البيان القرآني</small></span></button>
     <button id="quranSearchBtn" class="quran-search-btn" aria-label="البحث في آيات القرآن" title="البحث في الآيات"><span class="search-launch-icon">⌕</span><span class="search-launch-text">ابحث في آيات القرآن الكريم…</span></button>
     <div class="controls">
       <select id="surahSelect" aria-label="اختيار السورة"><option value="1">سورة الفاتحة</option></select>
@@ -362,6 +362,25 @@
         <button class="install-action" id="installActionBtn">تثبيت التطبيق</button>
       </div>
     </div>
+  </section>
+  <section class="about-overlay" id="aboutOverlay" aria-hidden="true">
+    <article class="about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+      <header><button id="closeAbout" class="search-close" aria-label="إغلاق التعريف">×</button><div><span>عن البرنامج</span><h2 id="aboutTitle">بصائر | تساؤلات في البيان القرآني</h2></div></header>
+      <div class="about-content">
+        <div class="about-emblem" aria-hidden="true">ب</div>
+        <p class="about-lead">مشروع قرآني تفاعلي يصاحب القارئ أثناء تلاوته، ويلفت نظره إلى دقائق التعبير ووجوه البيان في القرآن الكريم، من خلال أسئلة تنشأ من ملاحظة النص وتدبّره.</p>
+        <p class="about-stat">يضم الإصدار الحالي من «بصائر» 11,382 سؤالًا وجوابًا بيانيًا، مرتبطة بآيات القرآن الكريم، مع توثيق مصادر الأجوبة قدر الإمكان.</p>
+        <section class="about-method" aria-labelledby="methodTitle">
+          <h3 id="methodTitle">المنهج والمصادر</h3>
+          <p>اعتمد مشروع «بصائر» اعتمادًا رئيسيًا على «موسوعة التفسير البلاغي»، وهي من منشورات مجمع القرآن الكريم بالشارقة، بوصفها من أكبر روافد مادته العلمية، مع الإفادة من كتب التفسير والبلاغة والمصادر العلمية الموثوقة الأخرى.</p>
+          <p>واستُقرئت المادة سورةً سورة وآيةً آية، في مراحل متعددة، مع التركيز على المواضع التي تستوقف قارئ القرآن، ومن أبرزها:</p>
+          <p class="about-questions">لماذا اختيرت هذه الكلمة أو الصيغة أو الحرف؟ وما دلالة التقديم والتأخير؟ وما أثر الذكر والحذف والتكرار؟ وما الذي تضيفه الصورة البيانية؟ ولماذا اختلف التعبير بين الآيات المتشابهة؟ وما مناسبة ختام الآية وأسماء الله الواردة فيها؟</p>
+          <p>ولم يكن المقصود تحويل كل لطيفة بلاغية إلى سؤال؛ بل انتقاء السؤال الذي له باعث ظاهر في النص، ويكشف دقة التعبير، أو يوضح فرقًا بين الآيات المتشابهة، أو يحل إشكالًا حقيقيًا لدى القارئ.</p>
+        </section>
+        <p class="about-note">«بصائر» نافذة للتدبر والتأمل، ولا يغني عن كتب التفسير المعتمدة والرجوع إلى أهل العلم.</p>
+        <button id="aboutAction" class="about-action" type="button">ابدأ القراءة</button>
+      </div>
+    </article>
   </section>
   <div class="backdrop" id="backdrop"></div><div class="toast" id="toast"></div>
   <script src="questions.js"></script><script src="mushaf-v2.js"></script>
