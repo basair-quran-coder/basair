@@ -33,8 +33,9 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 .mushaf-head{position:absolute!important;z-index:7;top:21px;right:25px;left:25px;height:19px;padding-inline:10px}
 .mushaf-body{position:absolute!important;z-index:2;top:43px;right:28px;bottom:42px;left:28px;height:auto!important;padding:2px 10px!important;grid-template-rows:repeat(15,minmax(0,1fr))}
 .mushaf-foot{z-index:7;right:25px;left:25px;bottom:16px;height:18px}
-.mushaf-line{font-size:clamp(.82rem,4.35cqw,1.84rem);line-height:1;transform:none!important}
-.page-one .mushaf-line{font-size:clamp(.94rem,4.7cqw,2rem)}
+.mushaf-line{grid-column:1;font-size:clamp(.82rem,4.25cqw,2.55rem);line-height:1;transform:none!important}
+.cartouche,.basmala,.status{grid-column:1}
+.page-one .mushaf-line{font-size:clamp(.94rem,4.7cqw,2.7rem)}
 .o-bottom{display:none!important}
 .mushaf-foot b{position:relative;z-index:8;padding:1px 8px;border-radius:10px;background:var(--paper)}
 #mushafSecond{display:none}
