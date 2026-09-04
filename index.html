@@ -285,6 +285,7 @@
     <div class="controls">
       <select id="surahSelect" aria-label="اختيار السورة"><option value="1">سورة الفاتحة</option></select>
       <button id="offlineBtn" class="offline-btn" title="تنزيل صفحات المصحف وخطوطها">تنزيل دون اتصال</button>
+      <button id="bookmarkBtn" class="bookmark-btn" aria-label="موضع القراءة" title="حفظ موضع القراءة">♧</button>
       <button id="markersBtn" class="active" aria-pressed="true">أرقام الأسئلة</button>
       <button id="themeBtn" class="theme-button" aria-label="ألوان القراءة" title="ألوان القراءة">◉</button>
       <button id="installBtn" class="install-top-btn" aria-label="تثبيت بصائر" title="تثبيت بصائر"><span class="install-glyph">⇩</span><span>تثبيت</span></button>
@@ -293,13 +294,14 @@
   <main class="workspace">
     <section class="reader">
       <div class="readerbar">
-        <div><strong id="readerTitle">سورة الفاتحة</strong><small>صفحات مصحف المدينة · QCF V2</small></div>
+        <div><strong id="readerTitle">سورة الفاتحة</strong><small>صفحات مصحف المدينة · QPC V4</small></div>
         <div class="pager"><button id="prevPage" aria-label="الصفحة السابقة">→</button><button id="pageJumpBtn" class="page-jump" aria-label="الانتقال إلى صفحة">الصفحة ١</button><button id="nextPage" aria-label="الصفحة التالية">←</button></div>
         <div class="zoom-controls" aria-label="حجم صفحة المصحف"><button id="zoomOutBtn" aria-label="تصغير المصحف">−</button><button id="zoomResetBtn" title="الحجم الأصلي">١٠٠٪</button><button id="zoomInBtn" aria-label="تكبير المصحف">+</button></div>
       </div>
       <div class="mushaf-spread" id="mushafSpread">
       <article class="mushaf page-one spread-right" id="mushaf">
         <i class="frame"></i><i class="corner tr"></i><i class="corner tl"></i><i class="corner br"></i><i class="corner bl"></i><i class="ornament o-top">۞</i><i class="ornament o-bottom">۞</i>
+        <button class="reading-bookmark" id="readingBookmarkFirst" aria-label="حفظ هذه الصفحة موضعًا للقراءة" title="حفظ هذه الصفحة">◆</button>
         <button class="page-edge edge-right" id="edgePrev" aria-label="الصفحة السابقة">›</button><button class="page-edge edge-left" id="edgeNext" aria-label="الصفحة التالية">‹</button>
         <header class="mushaf-head"><span id="juzLabel">الجزء الأول</span><span id="hizbLabel">الحزب الأول</span><span id="surahLabel">سورة الفاتحة</span></header>
         <div class="mushaf-body" id="mushafBody"><div class="status"><span class="spinner"></span>يُهيَّأ خط صفحة المصحف…</div></div>
@@ -307,6 +309,7 @@
       </article>
       <article class="mushaf spread-left" id="mushafSecond" aria-label="الصفحة المقابلة">
         <i class="frame"></i><i class="corner tr"></i><i class="corner tl"></i><i class="corner br"></i><i class="corner bl"></i><i class="ornament o-top">۞</i><i class="ornament o-bottom">۞</i>
+        <button class="reading-bookmark" id="readingBookmarkSecond" aria-label="حفظ هذه الصفحة موضعًا للقراءة" title="حفظ هذه الصفحة">◆</button>
         <button class="page-edge edge-left" id="edgeNextSecond" aria-label="تقليب الصفحة الثانية إلى الصفحتين التاليتين">‹</button>
         <header class="mushaf-head"><span id="secondJuzLabel"></span><span id="secondHizbLabel"></span><span id="secondSurahLabel"></span></header>
         <div class="mushaf-body" id="secondMushafBody"></div>
