@@ -23,3 +23,41 @@ body.night{--outside:#0b1915;--paper:#1a2b25;--ink:#e9eee9;--muted:#a6b4ae;--gre
 .mushaf.page-one .mushaf-body{background:radial-gradient(circle at 50% 48%,rgba(200,157,67,.11),transparent 33%),radial-gradient(circle at 50% 62%,rgba(23,101,79,.07),transparent 30%)}
 body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94),0 0 0 14px #4e947d,0 0 0 16px #d2aa50,inset 0 0 0 10px rgba(24,48,39,.94),inset 0 0 0 12px rgba(211,169,77,.9)}
 @media(max-width:560px){.mushaf.opening-page::before{inset:27px 18px 36px;outline-offset:4px;box-shadow:0 0 0 7px rgba(251,246,226,.92),0 0 0 9px #17654f,0 0 0 11px #d2aa50,inset 0 0 0 7px rgba(255,253,242,.94),inset 0 0 0 9px rgba(177,130,40,.9);background-size:100% 9px,100% 9px,9px 100%,9px 100%}.mushaf.opening-page::after{top:22px;width:42px;height:21px;font-size:10px}.mushaf.opening-page .corner{width:35px;height:35px;box-shadow:0 0 0 1px #c29438,0 0 0 3px #fffaf0,inset 0 0 0 4px #fffaf0}.mushaf.opening-page .ornament{width:58px;height:22px}}
+
+/* V6: قارئ مصحف كامل — صفحة عموديًا وصفحتان متقابلتان أفقيًا */
+.workspace{display:block!important;max-width:none!important;padding:10px 12px 24px!important}
+.reader{width:100%;min-width:0}
+.mushaf-spread{direction:rtl;display:grid;grid-template-columns:minmax(0,1fr);justify-content:center;align-items:start;margin:auto}
+.mushaf{container-type:inline-size;width:min(calc(100vw - 28px),calc((100svh - 145px)*.651),900px)!important;padding:0!important}
+.mushaf-head{position:absolute!important;z-index:7;top:21px;right:25px;left:25px;height:19px;padding-inline:10px}
+.mushaf-body{position:absolute!important;z-index:2;top:43px;right:28px;bottom:42px;left:28px;height:auto!important;padding:2px 10px!important;grid-template-rows:repeat(15,minmax(0,1fr))}
+.mushaf-foot{z-index:7;right:25px;left:25px;bottom:16px;height:18px}
+.mushaf-line{font-size:clamp(.82rem,4.35cqw,1.84rem);line-height:1;transform:none!important}
+.page-one .mushaf-line{font-size:clamp(.94rem,4.7cqw,2rem)}
+#mushafSecond{display:none}
+.panel{display:flex;position:fixed!important;z-index:45;top:62px!important;right:0!important;bottom:0!important;left:auto!important;width:min(520px,88vw)!important;max-height:none!important;border-radius:20px 0 0 0!important;transform:translateX(105%);transition:.3s}
+.panel.open{transform:translateX(0)}
+.close{display:grid;place-items:center;position:absolute;left:14px;top:13px;width:34px;height:34px;border:1px solid var(--line);border-radius:10px;background:transparent}
+.backdrop{display:block;position:fixed;z-index:40;inset:0;background:rgba(4,20,16,.42);opacity:0;pointer-events:none}
+.backdrop.open{opacity:1;pointer-events:auto}
+
+@media(orientation:landscape) and (min-width:900px){
+  .workspace{padding:8px 10px 18px!important}
+  .readerbar{max-width:min(calc(100vw - 20px),calc((100svh - 137px)*1.302));margin-inline:auto}
+  .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 137px)*1.302));gap:0}
+  .mushaf{display:block!important;width:100%!important;max-width:none;margin:0;box-shadow:0 20px 55px rgba(23,51,43,.15)}
+  #mushaf{grid-column:1;border-radius:0 14px 14px 0}
+  #mushafSecond{grid-column:2;border-radius:14px 0 0 14px}
+  #mushaf::after{content:"";position:absolute;z-index:9;left:-1px;top:10px;bottom:10px;width:10px;background:linear-gradient(90deg,rgba(40,30,15,.12),transparent);pointer-events:none}
+  #mushafSecond::after{content:"";position:absolute;z-index:9;right:-1px;top:10px;bottom:10px;width:10px;background:linear-gradient(-90deg,rgba(40,30,15,.12),transparent);pointer-events:none}
+  .zoom-controls{display:none!important}
+}
+
+@media(max-width:560px){
+  .workspace{padding-inline:6px!important}
+  .mushaf{width:min(calc(100vw - 12px),calc((100svh - 137px)*.651))!important}
+  .mushaf-head{top:17px;right:15px;left:15px}
+  .mushaf-body{top:37px;right:16px;bottom:35px;left:16px;padding-inline:5px!important}
+  .mushaf-foot{right:15px;left:15px;bottom:12px}
+  .panel{top:58px!important;width:100%!important;border-radius:18px 0 0!important}
+}

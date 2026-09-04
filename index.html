@@ -297,13 +297,21 @@
         <div class="pager"><button id="prevPage" aria-label="الصفحة السابقة">→</button><button id="pageJumpBtn" class="page-jump" aria-label="الانتقال إلى صفحة">الصفحة ١</button><button id="nextPage" aria-label="الصفحة التالية">←</button></div>
         <div class="zoom-controls" aria-label="حجم صفحة المصحف"><button id="zoomOutBtn" aria-label="تصغير المصحف">−</button><button id="zoomResetBtn" title="الحجم الأصلي">١٠٠٪</button><button id="zoomInBtn" aria-label="تكبير المصحف">+</button></div>
       </div>
-      <article class="mushaf page-one" id="mushaf">
+      <div class="mushaf-spread" id="mushafSpread">
+      <article class="mushaf page-one spread-right" id="mushaf">
         <i class="frame"></i><i class="corner tr"></i><i class="corner tl"></i><i class="corner br"></i><i class="corner bl"></i><i class="ornament o-top">۞</i><i class="ornament o-bottom">۞</i>
         <button class="page-edge edge-right" id="edgePrev" aria-label="الصفحة السابقة">›</button><button class="page-edge edge-left" id="edgeNext" aria-label="الصفحة التالية">‹</button>
         <header class="mushaf-head"><span id="juzLabel">الجزء الأول</span><span id="hizbLabel">الحزب الأول</span><span id="surahLabel">سورة الفاتحة</span></header>
         <div class="mushaf-body" id="mushafBody"><div class="status"><span class="spinner"></span>يُهيَّأ خط صفحة المصحف…</div></div>
         <footer class="mushaf-foot"><span id="footerSurah">الفاتحة</span><b id="pageNumber">١</b><span>بصائر</span></footer>
       </article>
+      <article class="mushaf spread-left" id="mushafSecond" aria-label="الصفحة المقابلة">
+        <i class="frame"></i><i class="corner tr"></i><i class="corner tl"></i><i class="corner br"></i><i class="corner bl"></i><i class="ornament o-top">۞</i><i class="ornament o-bottom">۞</i>
+        <header class="mushaf-head"><span id="secondJuzLabel"></span><span id="secondHizbLabel"></span><span id="secondSurahLabel"></span></header>
+        <div class="mushaf-body" id="secondMushafBody"></div>
+        <footer class="mushaf-foot"><span id="secondFooterSurah"></span><b id="secondPageNumber"></b><span>بصائر</span></footer>
+      </article>
+      </div>
     </section>
     <aside class="panel" id="panel">
       <header><button class="close" id="closePanel" aria-label="إغلاق">×</button><div class="eyebrow"><span>بصائر الآية</span><span id="questionCount"></span></div><h1 id="panelTitle">المس آية من المصحف</h1><p>الرقم الأخضر على الآية هو عدد أسئلتها البيانية.</p></header>
