@@ -28,12 +28,15 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 .workspace{display:block!important;max-width:none!important;padding:10px 12px 24px!important}
 .reader{width:100%;min-width:0}
 .mushaf-spread{direction:rtl;display:grid;grid-template-columns:minmax(0,1fr);justify-content:center;align-items:start;margin:auto}
-.mushaf{container-type:inline-size;width:min(calc(100vw - 28px),calc((100svh - 145px)*.651),900px)!important;padding:0!important}
+.readerbar{display:none!important}
+.mushaf{container-type:inline-size;width:min(calc(100vw - 28px),calc((100svh - 84px)*.651),900px)!important;padding:0!important}
 .mushaf-head{position:absolute!important;z-index:7;top:21px;right:25px;left:25px;height:19px;padding-inline:10px}
 .mushaf-body{position:absolute!important;z-index:2;top:43px;right:28px;bottom:42px;left:28px;height:auto!important;padding:2px 10px!important;grid-template-rows:repeat(15,minmax(0,1fr))}
 .mushaf-foot{z-index:7;right:25px;left:25px;bottom:16px;height:18px}
 .mushaf-line{font-size:clamp(.82rem,4.35cqw,1.84rem);line-height:1;transform:none!important}
 .page-one .mushaf-line{font-size:clamp(.94rem,4.7cqw,2rem)}
+.o-bottom{display:none!important}
+.mushaf-foot b{position:relative;z-index:8;padding:1px 8px;border-radius:10px;background:var(--paper)}
 #mushafSecond{display:none}
 .panel{display:flex;position:fixed!important;z-index:45;top:62px!important;right:0!important;bottom:0!important;left:auto!important;width:min(520px,88vw)!important;max-height:none!important;border-radius:20px 0 0 0!important;transform:translateX(105%);transition:.3s}
 .panel.open{transform:translateX(0)}
@@ -43,8 +46,7 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 
 @media(orientation:landscape) and (min-width:900px){
   .workspace{padding:8px 10px 18px!important}
-  .readerbar{max-width:min(calc(100vw - 20px),calc((100svh - 137px)*1.302));margin-inline:auto}
-  .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 137px)*1.302));gap:0}
+  .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.302));gap:0}
   .mushaf{display:block!important;width:100%!important;max-width:none;margin:0;box-shadow:0 20px 55px rgba(23,51,43,.15)}
   #mushaf{grid-column:1;border-radius:0 14px 14px 0}
   #mushafSecond{grid-column:2;border-radius:14px 0 0 14px}
@@ -55,7 +57,7 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 
 @media(max-width:560px){
   .workspace{padding-inline:6px!important}
-  .mushaf{width:min(calc(100vw - 12px),calc((100svh - 137px)*.651))!important}
+  .mushaf{width:min(calc(100vw - 12px),calc((100svh - 78px)*.651))!important}
   .mushaf-head{top:17px;right:15px;left:15px}
   .mushaf-body{top:37px;right:16px;bottom:35px;left:16px;padding-inline:5px!important}
   .mushaf-foot{right:15px;left:15px;bottom:12px}
