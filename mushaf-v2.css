@@ -35,6 +35,7 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 .mushaf-line{grid-column:1;font-size:clamp(.82rem,4.25cqw,2.55rem);line-height:1;transform:none!important}
 .qpc-glyph{display:inline-block;filter:brightness(0)}
 body.night .qpc-glyph{filter:brightness(0) invert(1)}
+.word.end .qpc-glyph,body.night .word.end .qpc-glyph{filter:none}
 .cartouche,.basmala,.status{grid-column:1}
 .page-one .mushaf-line{font-size:clamp(.94rem,4.7cqw,2.7rem)}
 .o-bottom{display:none!important}

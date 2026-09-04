@@ -1,4 +1,4 @@
-const CACHE = 'basair-mushaf-complete-v6-10';
+const CACHE = 'basair-mushaf-complete-v6-11';
 const CORE = ['./', './index.html', './mushaf-v2.css', './mushaf-v2.js', './questions.js', './page-layout.js', './amiri-quran.ttf', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
