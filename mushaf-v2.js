@@ -10,7 +10,9 @@ const state={surah:Number(localStorage.getItem('basair-v3-surah')||1),page:Numbe
 const pageFonts=new Map(),pageMemory=new Map(),fontMemory=new Map(),questionIndex=new Map();
 for(const q of window.BASAIR_QUESTIONS||[])for(const verse of q.verses||[]){const key=`${q.surah}:${verse}`;if(!questionIndex.has(key))questionIndex.set(key,[]);questionIndex.get(key).push(q)}
 
-const DB_NAME='basair-mushaf-offline-v4';
+const DB_NAME='basair-mushaf-offline-v5';
+const QPC_BASE='https://cdn.jsdelivr.net/gh/hussainsajib/qpc-v4-mushaf-bundle@f84ccb5688d5404748a0d38e6c53e09df4469ec9';
+let qpcDataPromise=null,qpcWords=null,qpcCodes=null;
 const dbPromise=new Promise(resolve=>{if(!('indexedDB'in window)){resolve(null);return}const request=indexedDB.open(DB_NAME,1);request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains('pages'))db.createObjectStore('pages');if(!db.objectStoreNames.contains('fonts'))db.createObjectStore('fonts')};request.onsuccess=()=>resolve(request.result);request.onerror=()=>resolve(null)});
 async function dbGet(store,key){const db=await dbPromise;if(!db)return null;return new Promise(resolve=>{const tx=db.transaction(store,'readonly'),r=tx.objectStore(store).get(key);r.onsuccess=()=>resolve(r.result??null);r.onerror=()=>resolve(null)})}
 async function dbPut(store,key,value){const db=await dbPromise;if(!db)return false;return new Promise(resolve=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(value,key);tx.oncomplete=()=>resolve(true);tx.onerror=()=>resolve(false);tx.onabort=()=>resolve(false)})}
@@ -28,33 +30,40 @@ function spreadMode(){return spreadQuery.matches}
 function spreadStart(page){page=Math.max(1,Math.min(604,Number(page)||1));return spreadMode()&&page%2===0?page-1:page}
 function updateChrome(){state.page=spreadStart(state.page);const meta=META[state.surah]||META[1],second=spreadMode()&&state.page<604;$('surahSelect').value=state.surah;$('readerTitle').textContent=`سورة ${meta.name}`;$('pageJumpBtn').textContent=second?`الصفحتان ${toAr(state.page)}–${toAr(state.page+1)} من ${toAr(604)}`:`الصفحة ${toAr(state.page)} من ${toAr(604)}`;$('pageNumber').textContent=toAr(state.page);$('footerSurah').textContent=meta.name;$('surahLabel').textContent=`سورة ${meta.name}`;$('prevPage').disabled=state.page<=1;$('nextPage').disabled=second?state.page>=603:state.page>=604;$('edgePrev').disabled=state.page<=1;$('edgeNext').disabled=second?state.page>=603:state.page>=604;$('edgeNextSecond').disabled=state.page>=603;$('mushaf').classList.toggle('page-one',state.page===1);$('mushaf').classList.toggle('opening-page',state.page<=2);document.body.classList.toggle('spread-mode',spreadMode());document.body.classList.toggle('hide-markers',!state.markers);$('markersBtn').classList.toggle('active',state.markers);$('markersBtn').setAttribute('aria-pressed',String(state.markers));localStorage.setItem('basair-v3-page',state.page);localStorage.setItem('basair-v3-surah',state.surah)}
 
-async function getFontBytes(page){if(fontMemory.has(page))return fontMemory.get(page);const cached=await dbGet('fonts',page);if(cached){fontMemory.set(page,cached);return cached}const response=await fetch(`https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p${page}.woff2`);if(!response.ok)throw new Error('font-network');const bytes=await response.arrayBuffer();fontMemory.set(page,bytes);await dbPut('fonts',page,bytes);return bytes}
+async function getFontBytes(page){if(fontMemory.has(page))return fontMemory.get(page);const cached=await dbGet('fonts',page);if(cached){fontMemory.set(page,cached);return cached}const response=await fetch(`${QPC_BASE}/fonts/qpcv4/p${page}.woff2`);if(!response.ok)throw new Error('font-network');const bytes=await response.arrayBuffer();fontMemory.set(page,bytes);await dbPut('fonts',page,bytes);return bytes}
 async function loadFont(page){const name=`qcf-p${page}`;if(pageFonts.has(page))return pageFonts.get(page);const pending=(async()=>{const bytes=await getFontBytes(page),face=new FontFace(name,bytes,{style:'normal',weight:'400',display:'block'});await face.load();if(face.status!=='loaded')throw new Error('font');document.fonts.add(face);await document.fonts.ready;return name})();pageFonts.set(page,pending);try{return await pending}catch(error){pageFonts.delete(page);throw error}}
-function pageDataComplete(page,data){
-  const expected=new Set((window.BASAIR_PAGE_LINES?.[page]||[]).filter(row=>row[1]==='ayah').map(row=>row[0]));
-  const actual=new Set((data?.verses||[]).flatMap(v=>v.words||[]).map(w=>Number(w.line_number)).filter(Number.isFinite));
-  return expected.size>0&&[...expected].every(line=>actual.has(line));
+async function fetchQpcText(path){const response=await fetch(`${QPC_BASE}/data/${path}`);if(!response.ok)throw new Error('qpc-data-network');return response.text()}
+async function loadQpcData(){
+  if(qpcDataPromise)return qpcDataPromise;
+  qpcDataPromise=(async()=>{
+    const[wordsCsv,mappingCsv]=await Promise.all([fetchQpcText('words.csv'),fetchQpcText('qpc_mapping.csv')]);
+    qpcWords=new Map();qpcCodes=new Map();
+    const wordRows=wordsCsv.trim().split(/\r?\n/);
+    for(let i=1;i<wordRows.length;i++){const r=wordRows[i].split(','),id=Number(r[0]);qpcWords.set(id,{id,text:r.slice(5).join(','),surah:Number(r[2]),ayah:Number(r[3]),word:Number(r[4])})}
+    const codeRows=mappingCsv.trim().split(/\r?\n/);
+    for(let i=1;i<codeRows.length;i++){const r=codeRows[i].split(','),id=Number(r[0]);qpcCodes.set(id,(r[2]||'').trim().split(/\s+/).filter(Boolean).map(Number))}
+    if(qpcWords.size!==83668||qpcCodes.size!==83668)throw new Error('qpc-data-incomplete');
+  })();
+  try{await qpcDataPromise}catch(error){qpcDataPromise=null;qpcWords=null;qpcCodes=null;throw error}
 }
-function mergePageChunks(chunks){
-  const verses=new Map();
-  for(const chunk of chunks)for(const verse of chunk.verses||[]){
-    const current=verses.get(verse.verse_key)||{...verse,words:[]},words=new Map(current.words.map(w=>[Number(w.id),w]));
-    for(const word of verse.words||[])words.set(Number(word.id),word);
-    current.words=[...words.values()].sort((a,b)=>Number(a.id)-Number(b.id));verses.set(verse.verse_key,current);
+function juzForPageNumber(page){let juz=1;for(let i=0;i<JUZ_PAGE_STARTS.length;i++)if(JUZ_PAGE_STARTS[i]<=page)juz=i+1;return juz}
+function buildQpcPage(page){
+  const layout=window.BASAIR_PAGE_LINES?.[page]||[],verses=new Map(),juz=juzForPageNumber(page);
+  for(const[line,type,,first,last]of layout){
+    if(type!=='ayah')continue;
+    for(let id=first;id<=last;id++){
+      const source=qpcWords.get(id),codes=qpcCodes.get(id);if(!source||!codes?.length)throw new Error(`qpc-word-${id}`);
+      const key=`${source.surah}:${source.ayah}`,verse=verses.get(key)||{id,verse_key:key,verse_number:source.ayah,juz_number:juz,hizb_number:juz*2-1,words:[]};
+      verse.words.push({id,line_number:line,page_number:page,code_v2:String.fromCodePoint(...codes),text_qpc_hafs:source.text,text:source.text,char_type_name:/^\p{Nd}+$/u.test(source.text)?'end':'word'});
+      verses.set(key,verse);
+    }
   }
-  return{...chunks[0],verses:[...verses.values()].sort((a,b)=>Number(a.id)-Number(b.id)),pagination:{current_page:1,next_page:null}};
+  return{verses:[...verses.values()],pagination:{current_page:1,next_page:null},source:'qpc-v4'};
 }
 async function fetchPage(page){
   if(pageMemory.has(page))return pageMemory.get(page);
-  const cached=await dbGet('pages',page);if(pageDataComplete(page,cached)){pageMemory.set(page,cached);return cached}
-  const chunks=[];let resultPage=1;
-  for(let guard=0;guard<20;guard++){
-    const url=`https://api.quran.com/api/v4/verses/by_page/${page}?words=true&word_fields=id,code_v2,text_qpc_hafs,line_number,page_number&per_page=50&page=${resultPage}&mushaf=1`;
-    const response=await fetch(url,{cache:'no-store'});if(!response.ok)throw new Error('page-network');
-    const chunk=await response.json();if(!chunk.verses?.length)throw new Error('page-data');chunks.push(chunk);
-    const next=Number(chunk.pagination?.next_page);if(!next||next===resultPage)break;resultPage=next;
-  }
-  const data=mergePageChunks(chunks);if(!pageDataComplete(page,data))throw new Error(`page-incomplete-${page}`);
+  const cached=await dbGet('pages',page);if(cached?.source==='qpc-v4'&&cached.verses?.length){pageMemory.set(page,cached);return cached}
+  await loadQpcData();const data=buildQpcPage(page);
   pageMemory.set(page,data);await dbPut('pages',page,data);return data;
 }
 
@@ -73,7 +82,7 @@ function selectVerse(surah,verse,reveal=true){state.surah=surah;state.verse=vers
 let suppressClickUntil=0;function bindPage(root=document){root.querySelectorAll('.word').forEach(w=>w.addEventListener('click',e=>{if(Date.now()<suppressClickUntil)return;if(!e.target.closest('.marker'))selectVerse(Number(w.dataset.surah),Number(w.dataset.verse))}));root.querySelectorAll('.marker').forEach(m=>m.addEventListener('click',e=>{e.stopPropagation();if(Date.now()<suppressClickUntil)return;selectVerse(Number(m.dataset.markerSurah),Number(m.dataset.markerVerse))}))}
 function animateMushafBody(body=$('mushafBody')){body.classList.remove('page-enter');requestAnimationFrame(()=>body.classList.add('page-enter'))}
 let lineFitFrame=0,lineFitResizeTimer=0;
-function fitOnePage(root){if(!root||getComputedStyle(root).display==='none')return;const lines=[...root.querySelectorAll('.mushaf-line')];if(!lines.length)return;lines.forEach(line=>{line.style.fontSize='';line.style.justifyContent='center'});for(const line of lines){const available=line.clientWidth-8,natural=[...line.children].filter(el=>el.classList.contains('word')).reduce((sum,word)=>sum+word.getBoundingClientRect().width,0);if(!available||!natural||natural<=available)continue;const base=parseFloat(getComputedStyle(line).fontSize);line.style.fontSize=`${base*(available/natural)}px`}}
+function fitOnePage(root){if(!root||getComputedStyle(root).display==='none')return;const lines=[...root.querySelectorAll('.mushaf-line')];if(!lines.length)return;lines.forEach(line=>{line.style.fontSize='';line.style.justifyContent='center'});for(const line of lines){const words=[...line.children].filter(el=>el.classList.contains('word')),available=line.clientWidth-8,natural=words.reduce((sum,word)=>sum+word.getBoundingClientRect().width,0);if(!available||!natural)continue;const base=parseFloat(getComputedStyle(line).fontSize);if(natural>available){line.style.fontSize=`${base*(available/natural)}px`;continue}const gap=words.length>1?(available-natural)/(words.length-1):Infinity;if(!line.classList.contains('centered')&&gap<=base)line.style.justifyContent='space-between'}}
 function fitMushafLines(){cancelAnimationFrame(lineFitFrame);lineFitFrame=requestAnimationFrame(()=>{fitOnePage($('mushaf'));fitOnePage($('mushafSecond'))})}
 function pageHtml(data,font,useGlyphs=true,page=state.page){
   const fallbackLines=new Map();
@@ -89,9 +98,9 @@ function pageHtml(data,font,useGlyphs=true,page=state.page){
   const rows=layout.length?Math.max(...layout.map(row=>row[0])):15;
   const renderWords=(words,line,centered=false)=>{
     if(!words.length)return;
-    html+=`<div class="mushaf-line" style="grid-row:${line};font-family:${useGlyphs?`'${font}'`:'UthmanicHafs,AmiriQuran'}">`;
+    html+=`<div class="mushaf-line${centered?' centered':''}" style="grid-row:${line};font-family:${useGlyphs?`'${font}'`:'UthmanicHafs,AmiriQuran'}">`;
     for(const w of words){
-      const end=w.char_type_name==='end',qcf=useGlyphs&&!end,text=qcf?(w.code_v2||''):(w.text_qpc_hafs||w.text||'');
+      const end=w.char_type_name==='end',qcf=useGlyphs,text=qcf?(w.code_v2||''):(w.text_qpc_hafs||w.text||'');
       html+=`<span class="word ${end?'end':''}" data-surah="${w.surah}" data-verse="${w.verse}" style="font-family:${qcf?`'${font}'`:'UthmanicHafs,AmiriQuran'}">${text}${end?marker(w.surah,w.verse):''}</span>`;
     }
     html+='</div>';
@@ -128,7 +137,7 @@ function setColorTheme(theme,announce=false){if(!COLOR_THEMES[theme])theme='madi
 function openThemePicker(){closeQuranSearch();closeNavigation();$('themeOverlay').classList.add('open');$('themeOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
 function closeThemePicker(){$('themeOverlay').classList.remove('open');$('themeOverlay').setAttribute('aria-hidden','true');document.body.style.overflow=''}
 let toastTimer;function toast(text,duration=1800){clearTimeout(toastTimer);$('toast').textContent=text;$('toast').classList.add('show');toastTimer=setTimeout(()=>$('toast').classList.remove('show'),duration)}
-async function downloadOfflinePack(){if(state.downloading)return;state.downloading=true;$('offlineBtn').disabled=true;try{if(navigator.storage?.persist)await navigator.storage.persist();for(let start=1;start<=604;start+=4){const pages=Array.from({length:Math.min(4,605-start)},(_,i)=>start+i);$('offlineBtn').textContent=`تنزيل ${toAr(Math.min(604,start+3))}/${toAr(604)}`;await Promise.all(pages.map(async page=>{await fetchPage(page);await getFontBytes(page)}));for(const page of pages)if(page!==state.page){pageMemory.delete(page);fontMemory.delete(page)}}$('offlineBtn').textContent='متاح دون اتصال ✓';localStorage.setItem('basair-offline-complete-v4','yes');toast('اكتمل تنزيل المصحف للعمل دون اتصال',3200)}catch(error){$('offlineBtn').textContent='استكمال التنزيل';toast('توقف التنزيل؛ يمكنك استكماله عند عودة الاتصال',3200)}finally{state.downloading=false;$('offlineBtn').disabled=false}}
+async function downloadOfflinePack(){if(state.downloading)return;state.downloading=true;$('offlineBtn').disabled=true;try{if(navigator.storage?.persist)await navigator.storage.persist();await loadQpcData();for(let start=1;start<=604;start+=4){const pages=Array.from({length:Math.min(4,605-start)},(_,i)=>start+i);$('offlineBtn').textContent=`تنزيل ${toAr(Math.min(604,start+3))}/${toAr(604)}`;await Promise.all(pages.map(async page=>{await fetchPage(page);await getFontBytes(page)}));for(const page of pages)if(page!==state.page){pageMemory.delete(page);fontMemory.delete(page)}}$('offlineBtn').textContent='متاح دون اتصال ✓';localStorage.setItem('basair-offline-complete-v5','yes');toast('اكتمل تنزيل المصحف للعمل دون اتصال',3200)}catch(error){$('offlineBtn').textContent='استكمال التنزيل';toast('توقف التنزيل؛ يمكنك استكماله عند عودة الاتصال',3200)}finally{state.downloading=false;$('offlineBtn').disabled=false}}
 
 let deferredInstallPrompt=null;
 function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true}
@@ -147,4 +156,4 @@ $('zoomOutBtn').addEventListener('click',()=>applyZoom(state.zoom-40));$('zoomIn
 $('themeBtn').addEventListener('click',openThemePicker);$('closeTheme').addEventListener('click',closeThemePicker);$('themeOverlay').addEventListener('click',e=>{if(e.target===$('themeOverlay'))closeThemePicker()});document.querySelectorAll('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>{setColorTheme(button.dataset.themeChoice,true);closeThemePicker()}));
 $('installBtn').addEventListener('click',()=>deferredInstallPrompt?requestInstall():openInstallHelp());$('closeInstall').addEventListener('click',closeInstallHelp);$('installOverlay').addEventListener('click',e=>{if(e.target===$('installOverlay'))closeInstallHelp()});$('installActionBtn').addEventListener('click',()=>deferredInstallPrompt?requestInstall():closeInstallHelp());window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;refreshInstallState()});window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;refreshInstallState();closeInstallHelp();toast('تم تثبيت بصائر بنجاح',3000)});window.matchMedia('(display-mode: standalone)').addEventListener?.('change',refreshInstallState);spreadQuery.addEventListener?.('change',()=>{state.page=spreadStart(state.page);loadPage()});window.addEventListener('resize',()=>{clearTimeout(lineFitResizeTimer);lineFitResizeTimer=setTimeout(fitMushafLines,120)});
 $('aboutBtn').addEventListener('click',openAbout);$('closeAbout').addEventListener('click',closeAbout);$('aboutAction').addEventListener('click',closeAbout);$('aboutOverlay').addEventListener('click',e=>{if(e.target===$('aboutOverlay'))closeAbout()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('aboutOverlay').classList.contains('open'))closeAbout();else if($('installOverlay').classList.contains('open'))closeInstallHelp();else if($('themeOverlay').classList.contains('open'))closeThemePicker();else if($('navOverlay').classList.contains('open'))closeNavigation();else if($('quranSearchOverlay').classList.contains('open'))closeQuranSearch();else closePanel()}if(!$('aboutOverlay').classList.contains('open')&&!$('installOverlay').classList.contains('open')&&!$('themeOverlay').classList.contains('open')&&!$('quranSearchOverlay').classList.contains('open')&&!$('navOverlay').classList.contains('open')){if(e.key==='ArrowLeft')step(1);if(e.key==='ArrowRight')step(-1)}});if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('service-worker.js').catch(()=>{});populateSurahs();populateNavigation();enableSwipeNavigation();applyZoom();setColorTheme(localStorage.getItem('basair-color-theme')||(localStorage.getItem('basair-v3-theme')==='night'?'night':'madinah'));refreshInstallState();if(localStorage.getItem('basair-offline-complete-v4')==='yes')$('offlineBtn').textContent='متاح دون اتصال ✓';loadPage();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('aboutOverlay').classList.contains('open'))closeAbout();else if($('installOverlay').classList.contains('open'))closeInstallHelp();else if($('themeOverlay').classList.contains('open'))closeThemePicker();else if($('navOverlay').classList.contains('open'))closeNavigation();else if($('quranSearchOverlay').classList.contains('open'))closeQuranSearch();else closePanel()}if(!$('aboutOverlay').classList.contains('open')&&!$('installOverlay').classList.contains('open')&&!$('themeOverlay').classList.contains('open')&&!$('quranSearchOverlay').classList.contains('open')&&!$('navOverlay').classList.contains('open')){if(e.key==='ArrowLeft')step(1);if(e.key==='ArrowRight')step(-1)}});if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('service-worker.js').catch(()=>{});populateSurahs();populateNavigation();enableSwipeNavigation();applyZoom();setColorTheme(localStorage.getItem('basair-color-theme')||(localStorage.getItem('basair-v3-theme')==='night'?'night':'madinah'));refreshInstallState();if(localStorage.getItem('basair-offline-complete-v5')==='yes')$('offlineBtn').textContent='متاح دون اتصال ✓';loadPage();
