@@ -285,6 +285,7 @@
     <div class="controls">
       <select id="surahSelect" aria-label="اختيار السورة"><option value="1">سورة الفاتحة</option></select>
       <button id="offlineBtn" class="offline-btn" title="تنزيل صفحات المصحف وخطوطها">تنزيل دون اتصال</button>
+      <button id="audioBtn" class="audio-top-btn" type="button" aria-label="الاستماع إلى القرآن" title="الاستماع إلى القرآن"><span aria-hidden="true">▶</span><b>الصوت</b></button>
       <button id="bookmarkBtn" class="bookmark-btn" aria-label="موضع القراءة" title="حفظ موضع القراءة">♧</button>
       <button id="markersBtn" class="active" aria-pressed="true">أرقام الأسئلة</button>
       <button id="themeBtn" class="theme-button" aria-label="ألوان القراءة" title="ألوان القراءة">◉</button>
@@ -366,6 +367,28 @@
       </div>
     </div>
   </section>
+  <section class="audio-overlay" id="audioOverlay" aria-hidden="true">
+    <div class="audio-dialog" role="dialog" aria-modal="true" aria-labelledby="audioTitle">
+      <header><button id="closeAudio" class="search-close" aria-label="إغلاق مشغّل التلاوة">×</button><div><span>المصحف الصوتي</span><h2 id="audioTitle">استمع إلى القرآن الكريم</h2></div></header>
+      <div class="audio-content">
+        <label class="audio-reader-field" for="audioReaderSelect"><span>القارئ</span><select id="audioReaderSelect"><option value="husary">محمود خليل الحصري</option><option value="minshawi">محمد صديق المنشاوي</option><option value="shuraim">سعود الشريم</option><option value="yasser">ياسر الدوسري</option></select></label>
+        <div class="audio-now"><span>السورة الحالية</span><strong id="audioSurahTitle">سورة الفاتحة</strong><small id="audioReaderName">محمود خليل الحصري</small></div>
+        <div class="audio-main-controls"><button id="audioPrev" type="button" aria-label="السورة السابقة">→</button><button id="audioPlay" class="audio-play" type="button" aria-label="تشغيل التلاوة">▶</button><button id="audioNext" type="button" aria-label="السورة التالية">←</button></div>
+        <input id="audioSeek" class="audio-seek" type="range" min="0" max="1000" value="0" aria-label="موضع التلاوة">
+        <div class="audio-time"><span id="audioElapsed">٠:٠٠</span><span id="audioDuration">٠:٠٠</span></div>
+        <section class="audio-download-card" aria-labelledby="audioDownloadTitle">
+          <div class="audio-download-heading"><div><span>الاستماع دون اتصال</span><h3 id="audioDownloadTitle">تنزيل المصحف كاملًا</h3></div><span class="audio-quality">جودة خفيفة</span></div>
+          <p>يُنزل البرنامج السور الـ١١٤ للقارئ المختار من المصدر. الجودة المستهدفة 48 kbps، وقد يستخدم المصدر أقرب جودة متاحة.</p>
+          <div class="audio-storage" id="audioStorageInfo">جاري تقدير المساحة المتاحة…</div>
+          <progress id="audioDownloadProgress" max="114" value="0"></progress>
+          <div class="audio-download-status" id="audioDownloadStatus">لم يبدأ التنزيل</div>
+          <div class="audio-download-actions"><button id="audioDownloadBtn" type="button">تنزيل المصحف كاملًا</button><button id="audioPauseDownload" type="button" hidden>إيقاف مؤقت</button><button id="audioDeleteBtn" class="danger" type="button">حذف التنزيل</button></div>
+          <small class="audio-download-note">يفضّل استخدام Wi‑Fi وإبقاء بصائر مفتوحًا أثناء التنزيل. قد يحذف iOS الملفات لاحقًا إذا احتاج الجهاز إلى مساحة.</small>
+        </section>
+        <p class="audio-source">مصدر التلاوات: <a href="https://mp3quran.net/ar" target="_blank" rel="noopener">MP3Quran.net</a> · رواية حفص عن عاصم.</p>
+      </div>
+    </div>
+  </section>
   <section class="about-overlay" id="aboutOverlay" aria-hidden="true">
     <article class="about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
       <header><button id="closeAbout" class="search-close" aria-label="إغلاق التعريف">×</button><div><span>عن البرنامج</span><h2 id="aboutTitle">بصائر | تساؤلات في البيان القرآني</h2></div></header>
@@ -385,6 +408,7 @@
       </div>
     </article>
   </section>
+  <audio id="quranAudio" preload="metadata" playsinline></audio>
   <div class="backdrop" id="backdrop"></div><div class="toast" id="toast"></div>
   <script src="questions.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js"></script>
 </body>
