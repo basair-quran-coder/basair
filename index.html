@@ -251,6 +251,9 @@
     body.standalone .topbar { padding-top:env(safe-area-inset-top); }
     .install-top-btn { min-width:42px; display:flex; align-items:center; justify-content:center; gap:6px; border-color:rgba(173,129,52,.48)!important; background:color-mix(in srgb,var(--gold) 10%,white)!important; color:var(--green)!important; white-space:nowrap; }
     .install-top-btn .install-glyph { font:800 1rem Tahoma,sans-serif; }
+    .offline-btn { display:flex; align-items:center; justify-content:center; gap:5px; min-width:116px; }
+    .offline-btn .offline-glyph { font:800 .92rem Tahoma,sans-serif; }
+    .offline-btn[data-state="ready"] { border-color:rgba(23,110,74,.48)!important; background:rgba(23,110,74,.1)!important; color:var(--green)!important; }
     .install-top-btn[hidden] { display:none!important; }
     .install-overlay { position:fixed; z-index:86; inset:0; display:grid; place-items:center; padding:16px; background:rgba(5,25,19,.6); opacity:0; visibility:hidden; transition:.2s; backdrop-filter:blur(6px); }
     .install-overlay.open { opacity:1; visibility:visible; }
@@ -265,6 +268,11 @@
     .install-steps { width:100%; margin:0; padding:13px 38px 13px 16px; border:1px solid var(--line); border-radius:14px; background:color-mix(in srgb,var(--paper) 72%,transparent); color:var(--ink); text-align:right; line-height:2; }
     .install-action { width:100%; min-height:48px; border:0; border-radius:13px; background:var(--green); color:white; font:700 .92rem var(--qa); }
     @media (max-width:1099px) { .install-top-btn span:last-child { display:none; } }
+    @media (max-width:560px) {
+      .offline-btn { min-width:82px; }
+      .offline-btn .offline-label { font-size:0; }
+      .offline-btn .offline-label::after { content:attr(data-short); font-size:.68rem; }
+    }
     @media (max-width:560px) {
       .topbar .controls { width:100%; justify-content:flex-end; gap:4px; }
       .topbar .controls > button, .topbar .controls > select { min-height:44px; }
@@ -284,7 +292,7 @@
     <button id="quranSearchBtn" class="quran-search-btn" aria-label="البحث في آيات القرآن" title="البحث في الآيات"><span class="search-launch-icon">⌕</span><span class="search-launch-text">ابحث في آيات القرآن الكريم…</span></button>
     <div class="controls">
       <select id="surahSelect" aria-label="اختيار السورة"><option value="1">سورة الفاتحة</option></select>
-      <button id="offlineBtn" class="offline-btn" title="تنزيل صفحات المصحف وخطوطها">تنزيل دون اتصال</button>
+      <button id="offlineBtn" class="offline-btn" type="button" aria-label="تنزيل المصحف للعمل دون اتصال" title="تنزيل المصحف للعمل دون اتصال"><span class="offline-glyph" aria-hidden="true">⇩</span><span id="offlineLabel" class="offline-label" data-short="تنزيل">تنزيل دون اتصال</span></button>
       <button id="audioBtn" class="audio-top-btn" type="button" aria-label="الاستماع إلى القرآن" title="الاستماع إلى القرآن"><span aria-hidden="true">▶</span><b>الصوت</b></button>
       <button id="bookmarkBtn" class="bookmark-btn" aria-label="موضع القراءة" title="حفظ موضع القراءة">♧</button>
       <button id="markersBtn" class="active" aria-pressed="true">أرقام الأسئلة</button>
