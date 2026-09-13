@@ -99,3 +99,13 @@ body.night .about-features>div{background:rgba(25,48,39,.72)}
 @media(max-width:849px){.audio-top-btn b{display:none}.audio-top-btn{width:40px;padding:0!important}}
 @media(max-width:560px){.audio-overlay{align-items:end;padding:0}.audio-dialog{width:100%;max-height:94vh;border-radius:24px 24px 0 0;padding-bottom:env(safe-area-inset-bottom)}.audio-dialog>header{padding:14px 16px 11px}.audio-content{padding:16px}.audio-now strong{font-size:1.2rem}.audio-download-actions button{flex:1}.topbar .controls .audio-top-btn{flex:0 0 40px}}
 @media(max-width:430px){.topbar .controls select{flex:0 1 100px!important;min-width:82px!important;max-width:100px!important}.topbar .controls .offline-btn{width:44px!important;max-width:44px!important;padding:0!important;font-size:0}.topbar .controls .offline-btn::after{content:'⇩';font-size:1rem}.topbar .controls #bookmarkBtn,.topbar .controls #markersBtn,.topbar .controls #themeBtn,.topbar .controls #installBtn{width:38px;min-width:38px;padding:0}.topbar .controls .audio-top-btn{width:38px;min-width:38px;flex-basis:38px}}
+
+.audio-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(23,77,62,.05)}
+.audio-mode-switch button{min-height:40px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:700 .9rem Dubai,Arial,sans-serif;cursor:pointer}
+.audio-mode-switch button.active{background:var(--green);color:#fff;box-shadow:0 4px 12px rgba(23,77,62,.18)}
+.audio-location-fields{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,.8fr);gap:9px}
+.audio-location-fields .audio-reader-field{margin:0}
+.audio-auto-next{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.85rem;cursor:pointer}
+.audio-auto-next input{accent-color:var(--green);width:18px;height:18px}
+#audioAyahField[hidden],#audioDownloadCard[hidden],#audioAutoNextRow[hidden]{display:none!important}
+@media(max-width:560px){.audio-location-fields{grid-template-columns:1fr 1fr}.audio-mode-switch button{font-size:.84rem}}
