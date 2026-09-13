@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="stylesheet" href="mushaf-v2.css?v=6-20">
+  <link rel="stylesheet" href="mushaf-v2.css?v=6-30">
   <style>
     @media (min-width: 561px) {
       .quran-search-btn { width: clamp(250px, 25vw, 370px); justify-content: flex-start; }
@@ -300,6 +300,14 @@
       <button id="installBtn" class="install-top-btn" aria-label="تثبيت بصائر" title="تثبيت بصائر"><span class="install-glyph">⇩</span><span>تثبيت</span></button>
     </div>
   </header>
+  <nav class="experience-bar" aria-label="وضع استخدام بصائر">
+    <div class="experience-switch" role="tablist">
+      <button type="button" data-experience-mode="reading" role="tab"><span>☾</span><b>القراءة</b><small>مصحف صافٍ</small></button>
+      <button type="button" data-experience-mode="reflect" role="tab"><span>✦</span><b>التدبر</b><small>بصائر الآيات</small></button>
+      <button type="button" data-experience-mode="study" role="tab"><span>⌘</span><b>الدراسة</b><small>أسئلة ومقارنات</small></button>
+    </div>
+    <p id="experienceHint">قراءة هادئة دون عناصر إضافية</p>
+  </nav>
   <main class="workspace">
     <section class="reader">
       <div class="readerbar">
@@ -327,7 +335,12 @@
       </div>
     </section>
     <aside class="panel" id="panel">
-      <header><button class="close" id="closePanel" aria-label="إغلاق">×</button><div class="eyebrow"><span>بصائر الآية</span><span id="questionCount"></span></div><h1 id="panelTitle">المس آية من المصحف</h1><p>الرقم الأخضر على الآية هو عدد أسئلتها البيانية.</p></header>
+      <header><button class="close" id="closePanel" aria-label="إغلاق">×</button><div class="eyebrow"><span>بصائر الآية</span><span id="questionCount"></span></div><h1 id="panelTitle">المس آية من المصحف</h1><p id="panelIntro">كل بصيرة تبدأ بملاحظة وتنتهي بفهم.</p></header>
+      <div class="insight-tabs" role="tablist" aria-label="محتوى بصائر الآية">
+        <button type="button" data-insight-tab="featured" role="tab">الأبرز</button>
+        <button type="button" data-insight-tab="all" role="tab">جميع الأسئلة</button>
+        <button type="button" data-insight-tab="similar" role="tab">المتشابهات</button>
+      </div>
       <div class="search"><input id="search" type="search" placeholder="ابحث في أسئلة الآية…" aria-label="بحث في الأسئلة"></div>
       <div class="question-list" id="questionList"><div class="empty empty-guide"><span class="empty-emblem">ب</span><strong>اختر آية من المصحف</strong><small>المس كلمات الآية أو رقمها الأخضر لتظهر بصائرها وأسئلتها البيانية.</small></div></div>
       <footer>لمس الرقم يفتح البصائر، ولمس كلمات الآية يحددها.</footer>
@@ -400,6 +413,19 @@
       </div>
     </div>
   </section>
+  <section class="audio-mini" id="audioMini" hidden aria-label="مشغّل التلاوة المصغر">
+    <button class="audio-mini-open" id="audioMiniOpen" type="button" aria-label="فتح إعدادات الصوت">
+      <span class="audio-mini-emblem">◖</span>
+      <span><strong id="audioMiniTitle">سورة الفاتحة</strong><small id="audioMiniReader">المصحف الصوتي</small></span>
+    </button>
+    <div class="audio-mini-controls">
+      <button id="audioMiniPrev" type="button" aria-label="السابق">→</button>
+      <button id="audioMiniPlay" class="audio-mini-play" type="button" aria-label="تشغيل">▶</button>
+      <button id="audioMiniNext" type="button" aria-label="التالي">←</button>
+    </div>
+    <button id="audioMiniClose" class="audio-mini-close" type="button" aria-label="إيقاف وإغلاق المشغل">×</button>
+    <span class="audio-mini-progress" id="audioMiniProgress"></span>
+  </section>
   <section class="about-overlay" id="aboutOverlay" aria-hidden="true">
     <article class="about-dialog" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
       <header><button id="closeAbout" class="search-close" aria-label="إغلاق التعريف">×</button><div><span>عن البرنامج</span><h2 id="aboutTitle">بصائر | تساؤلات في البيان القرآني</h2></div></header>
@@ -421,6 +447,6 @@
   </section>
   <audio id="quranAudio" preload="metadata" playsinline></audio>
   <div class="backdrop" id="backdrop"></div><div class="toast" id="toast"></div>
-  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-25"></script>
+  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-30"></script>
 </body>
 </html>
