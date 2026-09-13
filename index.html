@@ -110,8 +110,8 @@
     /* V5 — تخطيط موحّد وأكثر هدوءًا */
     :root { --reader-page-width: 780px; }
     .topbar { min-height: 68px; height: auto; border-bottom-color: rgba(23,77,62,.12); box-shadow: 0 5px 20px rgba(23,51,43,.045); }
-    .topbar > .quran-search-btn { height: 44px; width: 100%; max-width: 480px; display: flex; align-items: center; gap: 11px; padding-inline: 16px; border: 1px solid rgba(173,129,52,.48); border-radius: 13px; background: rgba(255,255,255,.86); text-align: right; }
-    .topbar > .quran-search-btn:hover { border-color: var(--gold); box-shadow: 0 6px 18px rgba(23,77,62,.08); }
+    .topbar > .search-audio-group { height: 44px; width: 100%; max-width: 480px; display: flex; align-items: center; gap: 11px; padding-inline: 16px; border: 1px solid rgba(173,129,52,.48); border-radius: 13px; background: rgba(255,255,255,.86); text-align: right; }
+    .topbar > .search-audio-group:hover { border-color: var(--gold); box-shadow: 0 6px 18px rgba(23,77,62,.08); }
     .readerbar { height: 50px; min-height: 50px; margin: 0 0 10px; padding-inline: 3px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
     .readerbar > div:first-child { justify-self: start; max-width: none; }
     .readerbar .pager { position: static; transform: none; justify-self: center; }
@@ -127,13 +127,13 @@
     .question.open .q-trigger > span:last-child { transform: rotate(180deg); background: var(--green); color: white; }
     .question.open .q-no { background: var(--gold); color: white; }
     .question-list { scrollbar-color: rgba(173,129,52,.45) transparent; scrollbar-width: thin; }
-    body.night .topbar > .quran-search-btn, body.night .zoom-controls button, body.night .readerbar .pager button { background: #193027; }
+    body.night .topbar > .search-audio-group, body.night .zoom-controls button, body.night .readerbar .pager button { background: #193027; }
     body.night .question { background: rgba(25,48,39,.72); }
     body.night .question.open { background: linear-gradient(135deg,rgba(31,58,48,.96),rgba(73,65,35,.52)); }
     @media (min-width: 1100px) {
       .topbar { direction: ltr; display: grid; grid-template-columns: minmax(330px,1fr) minmax(300px,480px) minmax(260px,1fr); gap: 18px; }
       .topbar .brand { grid-column: 3; justify-self: end; direction: rtl; }
-      .topbar > .quran-search-btn { grid-column: 2; justify-self: center; direction: rtl; }
+      .topbar > .search-audio-group { grid-column: 2; justify-self: center; direction: rtl; }
       .topbar .controls { grid-column: 1; justify-self: start; direction: rtl; }
     }
     @media (min-width: 1181px) {
@@ -145,7 +145,7 @@
       .topbar { padding-block: 8px; flex-wrap: wrap; }
       .topbar .brand { order: 1; }
       .topbar .controls { order: 2; margin-inline-start: auto; }
-      .topbar > .quran-search-btn { order: 3; flex: 1 0 100%; max-width: none; }
+      .topbar > .search-audio-group { order: 3; flex: 1 0 100%; max-width: none; }
     }
     @media (max-width: 1180px) {
       .readerbar { grid-template-columns: 1fr auto; height: auto; min-height: 48px; row-gap: 7px; }
@@ -155,8 +155,8 @@
     }
     @media (max-width: 560px) {
       .topbar { padding-block: 7px; }
-      .topbar > .quran-search-btn { width: 100%; height: 42px; }
-      .topbar > .quran-search-btn .search-launch-text { display: block; }
+      .topbar > .search-audio-group { width: 100%; height: 42px; }
+      .topbar > .search-audio-group .search-launch-text { display: block; }
       .readerbar .pager .page-jump { min-width: 112px; }
       .panel .q-text { font-size: 1rem; }
       .panel .answer { font-size: .98rem; }
@@ -169,7 +169,7 @@
     @media (min-width: 850px) {
       .topbar { direction: ltr; display: grid; grid-template-columns: minmax(330px,1fr) minmax(240px,400px) minmax(180px,1fr); align-items: center; gap: 12px; height: 64px; min-height: 64px; padding-block: 0; }
       .topbar .brand { grid-column: 3; grid-row: 1; justify-self: end; direction: rtl; order: initial; }
-      .topbar > .quran-search-btn { grid-column: 2; grid-row: 1; justify-self: stretch; direction: rtl; order: initial; max-width: none; height: 42px; }
+      .topbar > .search-audio-group { grid-column: 2; grid-row: 1; justify-self: stretch; direction: rtl; order: initial; max-width: none; height: 42px; }
       .topbar .controls { grid-column: 1; grid-row: 1; justify-self: start; direction: rtl; order: initial; flex-wrap: nowrap; gap: 5px; }
       .topbar .controls > * { height: 38px; padding-inline: 9px; }
       .topbar .controls select { width: 145px; max-width: 145px; }
@@ -178,14 +178,14 @@
     }
     @media (max-width: 849px) {
       .topbar { min-height: 0; padding-block: 7px; row-gap: 7px; }
-      .topbar > .quran-search-btn { height: 40px; }
+      .topbar > .search-audio-group { height: 40px; }
     }
     body.night .readerbar .pager .page-jump { background: #193027; }
 
     /* V5.2 — صقل بصري وتفاعلي */
     .topbar .controls > * { color: #3f514a; border-color: rgba(23,77,62,.2); font-weight: 600; }
     .topbar .controls select { color: #263f36; }
-    .topbar > .quran-search-btn .search-launch-text { color: #53665f; }
+    .topbar > .search-audio-group .search-launch-text { color: #53665f; }
     .readerbar small { color: #65766f; }
     .readerbar .pager .page-jump { color: #164a3c; font-weight: 800; }
     button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid rgba(173,129,52,.72); outline-offset: 2px; }
@@ -200,7 +200,7 @@
     @keyframes pageReveal { from { opacity: .35; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .question .q-body { transition-duration: .3s; }
     .question.open .q-text { color: #143f32; }
-    body.night .topbar .controls > *, body.night .topbar .controls select, body.night .topbar > .quran-search-btn .search-launch-text { color: #d3ddd8; }
+    body.night .topbar .controls > *, body.night .topbar .controls select, body.night .topbar > .search-audio-group .search-launch-text { color: #d3ddd8; }
     body.night .word.selected { color: #f3df9f; background: linear-gradient(to top,rgba(209,180,95,.22) 0 35%,transparent 36%); }
     body.night .question.open .q-text { color: #f4e7bd; }
 
@@ -211,9 +211,9 @@
     body.theme-blue .topbar { background:rgba(245,250,252,.95); }
     body.theme-paper .topbar { background:rgba(244,235,216,.96); }
     body.theme-burgundy .topbar { background:rgba(252,246,239,.96); }
-    body.theme-blue .topbar > .quran-search-btn, body.theme-blue .zoom-controls button, body.theme-blue .readerbar .pager button, body.theme-blue .page-number-row input, body.theme-blue .nav-select-row select { background:#fafdff; }
-    body.theme-paper .topbar > .quran-search-btn, body.theme-paper .zoom-controls button, body.theme-paper .readerbar .pager button, body.theme-paper .page-number-row input, body.theme-paper .nav-select-row select { background:#fbf3e1; }
-    body.theme-burgundy .topbar > .quran-search-btn, body.theme-burgundy .zoom-controls button, body.theme-burgundy .readerbar .pager button, body.theme-burgundy .page-number-row input, body.theme-burgundy .nav-select-row select { background:#fffaf3; }
+    body.theme-blue .topbar > .search-audio-group, body.theme-blue .zoom-controls button, body.theme-blue .readerbar .pager button, body.theme-blue .page-number-row input, body.theme-blue .nav-select-row select { background:#fafdff; }
+    body.theme-paper .topbar > .search-audio-group, body.theme-paper .zoom-controls button, body.theme-paper .readerbar .pager button, body.theme-paper .page-number-row input, body.theme-paper .nav-select-row select { background:#fbf3e1; }
+    body.theme-burgundy .topbar > .search-audio-group, body.theme-burgundy .zoom-controls button, body.theme-burgundy .readerbar .pager button, body.theme-burgundy .page-number-row input, body.theme-burgundy .nav-select-row select { background:#fffaf3; }
     body.theme-blue .question { background:rgba(250,253,255,.72); }
     body.theme-paper .question { background:rgba(255,249,235,.68); }
     body.theme-burgundy .question { background:rgba(255,251,245,.72); }
@@ -283,13 +283,23 @@
       .readerbar .pager button { min-width:44px; min-height:44px; }
       .panel > footer { padding-bottom:calc(11px + env(safe-area-inset-bottom)); }
     }
+    /* زر تحكم صوتي ملاصق للبحث دون زيادة ارتفاع الرأس */
+    .topbar > .search-audio-group { overflow:hidden; gap:0!important; padding:0!important; }
+    .search-audio-group .quran-search-btn { flex:1; min-width:0; height:100%; display:flex; align-items:center; gap:11px; padding-inline:16px; border:0; background:transparent; text-align:right; }
+    .quick-audio-toggle { flex:0 0 46px; width:46px; height:100%; display:grid; place-items:center; padding:0; border:0; border-inline-start:1px solid rgba(173,129,52,.34); background:rgba(173,129,52,.1); color:var(--green); font:700 .82rem Tahoma,sans-serif; }
+    .quick-audio-toggle.playing { background:var(--green); color:#fff; }
+    .quick-audio-toggle[hidden] { display:none!important; }
+    @media(max-width:560px){.quick-audio-toggle{flex-basis:42px;width:42px}.search-audio-group .quran-search-btn{padding-inline:12px}}
   </style>
   <title>بصائر | المصحف التفاعلي الكامل</title>
 </head>
 <body>
   <header class="topbar">
     <button class="brand" id="aboutBtn" type="button" aria-label="التعريف ببرنامج بصائر" title="عن بصائر"><b>ب</b><span><strong>بصائر</strong><small>تساؤلات في البيان القرآني</small></span></button>
-    <button id="quranSearchBtn" class="quran-search-btn" aria-label="البحث في آيات القرآن" title="البحث في الآيات"><span class="search-launch-icon">⌕</span><span class="search-launch-text">ابحث في آيات القرآن الكريم…</span></button>
+    <div class="search-audio-group">
+      <button id="quranSearchBtn" class="quran-search-btn" aria-label="البحث في آيات القرآن" title="البحث في الآيات"><span class="search-launch-icon">⌕</span><span class="search-launch-text">ابحث في آيات القرآن الكريم…</span></button>
+      <button id="quickAudioToggle" class="quick-audio-toggle" type="button" aria-label="إيقاف التلاوة مؤقتًا" title="إيقاف التلاوة مؤقتًا" hidden>❚❚</button>
+    </div>
     <div class="controls">
       <select id="surahSelect" aria-label="اختيار السورة"><option value="1">سورة الفاتحة</option></select>
       <button id="offlineBtn" class="offline-btn" type="button" aria-label="تنزيل المصحف للعمل دون اتصال" title="تنزيل المصحف للعمل دون اتصال"><span class="offline-glyph" aria-hidden="true">⇩</span><span id="offlineLabel" class="offline-label" data-short="تنزيل">تنزيل دون اتصال</span></button>
@@ -421,6 +431,6 @@
   </section>
   <audio id="quranAudio" preload="metadata" playsinline></audio>
   <div class="backdrop" id="backdrop"></div><div class="toast" id="toast"></div>
-  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-25"></script>
+  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-26"></script>
 </body>
 </html>
