@@ -199,19 +199,15 @@
     .mushaf-body.page-enter { animation: pageReveal .3s ease-out both; }
     @keyframes pageReveal { from { opacity: .35; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .mushaf-spread { position: relative; perspective: 1800px; transform-style: preserve-3d; }
-    .page-turn-layer { position:absolute!important; z-index:24; inset:0; width:100%!important; margin:0!important; pointer-events:none; transform-style:preserve-3d; backface-visibility:hidden; will-change:transform,filter,opacity; }
-    .page-turn-layer::before { content:""; position:absolute; z-index:30; top:0; bottom:0; width:18%; opacity:0; pointer-events:none; }
-    .page-turn-layer.turn-next { transform-origin:right center; }
-    .page-turn-layer.turn-prev { transform-origin:left center; }
-    .page-turn-layer.turn-next::before { right:0; background:linear-gradient(90deg,transparent,rgba(45,34,19,.28)); }
-    .page-turn-layer.turn-prev::before { left:0; background:linear-gradient(90deg,rgba(45,34,19,.28),transparent); }
-    .page-turn-layer.turn-next.turn-active { animation:pageTurnNext .64s cubic-bezier(.28,.72,.24,1) forwards; }
-    .page-turn-layer.turn-prev.turn-active { animation:pageTurnPrev .64s cubic-bezier(.28,.72,.24,1) forwards; }
-    .page-turn-layer.turn-active::before { animation:pageTurnShade .64s ease forwards; }
-    @keyframes pageTurnNext { 0%{transform:rotateY(0);filter:brightness(1);opacity:1} 55%{filter:brightness(.9);opacity:.96} 100%{transform:rotateY(88deg);filter:brightness(.78);opacity:.08} }
-    @keyframes pageTurnPrev { 0%{transform:rotateY(0);filter:brightness(1);opacity:1} 55%{filter:brightness(.9);opacity:.96} 100%{transform:rotateY(-88deg);filter:brightness(.78);opacity:.08} }
-    @keyframes pageTurnShade { 0%{opacity:0} 48%{opacity:.9} 100%{opacity:.18} }
-    @media(prefers-reduced-motion:reduce){.page-turn-layer{display:none!important}}
+    .mushaf-spread { backface-visibility:hidden; will-change:transform,filter,opacity; }
+    .mushaf-spread.page-turn-exit.page-turn-next { animation:pageTurnOutNext .26s cubic-bezier(.28,.72,.24,1) both; }
+    .mushaf-spread.page-turn-exit.page-turn-prev { animation:pageTurnOutPrev .26s cubic-bezier(.28,.72,.24,1) both; }
+    .mushaf-spread.page-turn-enter.page-turn-next { animation:pageTurnInNext .3s cubic-bezier(.28,.72,.24,1) both; }
+    .mushaf-spread.page-turn-enter.page-turn-prev { animation:pageTurnInPrev .3s cubic-bezier(.28,.72,.24,1) both; }
+    @keyframes pageTurnOutNext { from{transform:perspective(1700px) rotateY(0);opacity:1;filter:brightness(1)} to{transform:perspective(1700px) rotateY(78deg);opacity:.08;filter:brightness(.8)} }
+    @keyframes pageTurnOutPrev { from{transform:perspective(1700px) rotateY(0);opacity:1;filter:brightness(1)} to{transform:perspective(1700px) rotateY(-78deg);opacity:.08;filter:brightness(.8)} }
+    @keyframes pageTurnInNext { from{transform:perspective(1700px) rotateY(-78deg);opacity:.12;filter:brightness(.8)} to{transform:perspective(1700px) rotateY(0);opacity:1;filter:brightness(1)} }
+    @keyframes pageTurnInPrev { from{transform:perspective(1700px) rotateY(78deg);opacity:.12;filter:brightness(.8)} to{transform:perspective(1700px) rotateY(0);opacity:1;filter:brightness(1)} }
     .question .q-body { transition-duration: .3s; }
     .question.open .q-text { color: #143f32; }
     body.night .topbar .controls > *, body.night .topbar .controls select, body.night .topbar > .quran-search-btn .search-launch-text { color: #d3ddd8; }
@@ -442,6 +438,6 @@
   </section>
   <audio id="quranAudio" preload="metadata" playsinline></audio>
   <div class="backdrop" id="backdrop"></div><div class="toast" id="toast"></div>
-  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-34"></script>
+  <script src="question-parts/questions-part-001.js"></script><script src="question-parts/questions-part-002.js"></script><script src="question-parts/questions-part-003.js"></script><script src="question-parts/questions-part-004.js"></script><script src="question-parts/questions-part-005.js"></script><script src="question-parts/questions-part-006.js"></script><script src="question-parts/questions-part-007.js"></script><script src="question-parts/questions-part-008.js"></script><script src="question-parts/questions-part-009.js"></script><script src="question-parts/questions-part-010.js"></script><script src="question-parts/questions-part-011.js"></script><script src="question-parts/questions-part-012.js"></script><script src="question-parts/questions-part-013.js"></script><script src="question-parts/questions-part-014.js"></script><script src="question-parts/questions-part-015.js"></script><script src="question-parts/questions-part-016.js"></script><script src="question-parts/questions-part-017.js"></script><script src="question-parts/questions-part-018.js"></script><script src="question-parts/questions-part-019.js"></script><script src="question-parts/questions-part-020.js"></script><script src="question-parts/questions-part-021.js"></script><script src="question-parts/questions-part-022.js"></script><script src="question-parts/questions-part-023.js"></script><script src="question-parts/questions-part-024.js"></script><script src="question-parts/questions-part-025.js"></script><script src="question-parts/questions-counts.js"></script><script src="page-layout.js"></script><script src="mushaf-v2.js?v=6-35"></script>
 </body>
 </html>
