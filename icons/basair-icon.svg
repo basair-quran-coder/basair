@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#174d3e"/>
+  <rect x="42" y="42" width="428" height="428" rx="90" fill="none" stroke="#c8a65a" stroke-width="8"/>
+  <rect x="57" y="57" width="398" height="398" rx="78" fill="none" stroke="#f4e6b8" stroke-opacity=".62" stroke-width="3"/>
+  <path d="M145 116h222M145 396h222" stroke="#c8a65a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M256 94l13 13-13 13-13-13zM256 392l13 13-13 13-13-13z" fill="#f4e6b8" stroke="#c8a65a" stroke-width="3"/>
+  <text x="256" y="351" fill="#fffaf0" font-family="Amiri, 'Noto Naskh Arabic', serif" font-size="270" font-weight="700" text-anchor="middle">ب</text>
+  <circle cx="256" cy="379" r="13" fill="#c8a65a"/>
+</svg>
