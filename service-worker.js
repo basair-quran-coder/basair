@@ -1,5 +1,5 @@
-const SHELL_CACHE = 'basair-shell-v6-48';
-const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48';
+const SHELL_CACHE = 'basair-shell-v6-48-1';
+const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-1';
 const CORE = [
   './',
   './index.html',
@@ -61,7 +61,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
 
-  if (url.origin === self.location.origin && /\/mushaf-pages\/\d{3}\.webp$/.test(url.pathname)) {
+  if (url.origin === self.location.origin && /\/mushaf-pages\/pages-\d{2,3}\.js$/.test(url.pathname)) {
     event.respondWith(cacheMushafPage(event.request));
     return;
   }
