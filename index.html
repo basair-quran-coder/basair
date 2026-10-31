@@ -786,7 +786,7 @@ function highlightedVerse(text,query){const original=cleanVerseText(text),needle
 function populateSurahs(){$('surahSelect').innerHTML=SURAH_NAMES.map((name,i)=>`<option value="${i+1}">${toAr(i+1)} · سورة ${name}</option>`).join('');populateQuranSearchSurahs()}
 function pageWithinSurah(surah,page){const range=META[surah].pages;return page>=range[0]&&page<=range[1]}
 const spreadQuery=matchMedia('(orientation:landscape) and (min-width:980px)');
-const duoStyle=document.createElement('style');duoStyle.textContent='.duo-spread .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.304));gap:0}';document.head.appendChild(duoStyle);
+const duoStyle=document.createElement('style');duoStyle.textContent='.duo-spread .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.304));gap:0}.duo-spread #mushafSecond{display:block;grid-column:2}';document.head.appendChild(duoStyle);
 const duoQuery=matchMedia('(orientation:landscape) and (min-width:900px) and (max-width:1000px) and (min-height:500px) and (max-height:560px)');
 function isIPhoneDuo(){const w=window.innerWidth,h=window.innerHeight,sw=window.screen?.width||0,sh=window.screen?.height||0;return duoQuery.matches||(w>=940&&w<=970&&h>=510&&h<=550)||(sw>=940&&sw<=970&&sh>=510&&sh<=550)}
 function spreadMode(){return spreadQuery.matches||isIPhoneDuo()}
