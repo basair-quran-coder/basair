@@ -1,5 +1,5 @@
-const SHELL_CACHE = 'basair-shell-v6-48-3';
-const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-3';
+const SHELL_CACHE = 'basair-shell-v6-48-4';
+const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-4';
 const CORE = [
   './',
   './index.html',
