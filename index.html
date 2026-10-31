@@ -787,7 +787,7 @@ function populateSurahs(){$('surahSelect').innerHTML=SURAH_NAMES.map((name,i)=>`
 function pageWithinSurah(surah,page){const range=META[surah].pages;return page>=range[0]&&page<=range[1]}
 const spreadQuery=matchMedia('(orientation:landscape) and (min-width:980px)');
 const duoStyle=document.createElement('style');duoStyle.textContent='.duo-spread .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.304));gap:0}';document.head.appendChild(duoStyle);
-const duoQuery=matchMedia('(orientation:landscape) and (min-width:850px) and (max-width:950px)');
+const duoQuery=matchMedia('((orientation:landscape) and (min-width:850px) and (max-width:950px)) or ((orientation:portrait) and (min-width:600px) and (max-width:700px))');
 function isIPhoneDuo(){return duoQuery.matches}
 function spreadMode(){return spreadQuery.matches||isIPhoneDuo()}
 function spreadStart(page){page=Math.max(1,Math.min(604,Number(page)||1));return spreadMode()&&page%2===0?page-1:page}
