@@ -786,6 +786,7 @@ function highlightedVerse(text,query){const original=cleanVerseText(text),needle
 function populateSurahs(){$('surahSelect').innerHTML=SURAH_NAMES.map((name,i)=>`<option value="${i+1}">${toAr(i+1)} · سورة ${name}</option>`).join('');populateQuranSearchSurahs()}
 function pageWithinSurah(surah,page){const range=META[surah].pages;return page>=range[0]&&page<=range[1]}
 .mushaf-spread{direction:rtl;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.304));gap:0}\nconst spreadQuery=matchMedia('(orientation:landscape) and (min-width:980px)');
+const duoStyle=document.createElement('style');duoStyle.textContent='.duo-spread .mushaf-spread{grid-template-columns:repeat(2,minmax(0,1fr));width:min(calc(100vw - 20px),calc((100svh - 82px)*1.304));gap:0}';document.head.appendChild(duoStyle);
 const duoQuery=matchMedia('(orientation:portrait) and (min-width:500px) and (max-width:750px)');
 function isIPhoneDuo(){return /iPhone/i.test(navigator.userAgent)&&duoQuery.matches}
 function spreadMode(){return spreadQuery.matches||isIPhoneDuo()}
