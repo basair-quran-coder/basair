@@ -1,5 +1,5 @@
-const SHELL_CACHE = 'basair-shell-v6-48-23';
-const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-21';
+const SHELL_CACHE = 'basair-shell-v6-48-24';
+const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-1';
 const CORE = [
   './',
   './index.html',
@@ -25,16 +25,37 @@ self.addEventListener('install', event => {
   );
 });
 
+async function migrateMushafCaches() {
+  const keys = await caches.keys();
+  const oldKeys = keys.filter(key => key.startsWith('basair-mushaf-pages-') && key !== MUSHAF_CACHE);
+  const target = await caches.open(MUSHAF_CACHE);
+  for (const key of oldKeys) {
+    const source = await caches.open(key);
+    let migrated = true;
+    for (const request of await source.keys()) {
+      try {
+        if (!(await target.match(request))) {
+          const response = await source.match(request);
+          if (response) await target.put(request, response);
+        }
+      } catch {
+        migrated = false;
+        break;
+      }
+    }
+    if (migrated) await caches.delete(key);
+  }
+}
+
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key => key.startsWith('basair-shell-') && key !== SHELL_CACHE)
-          .map(key => caches.delete(key))
-      ))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys
+      .filter(key => key.startsWith('basair-shell-') && key !== SHELL_CACHE)
+      .map(key => caches.delete(key)));
+    await migrateMushafCaches();
+    await self.clients.claim();
+  })());
 });
 
 async function cacheMushafPage(request) {

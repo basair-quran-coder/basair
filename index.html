@@ -776,6 +776,7 @@ const dbPromise=new Promise(resolve=>{if(!('indexedDB'in window)){resolve(null);
 async function dbGet(store,key){const db=await dbPromise;if(!db)return null;return new Promise(resolve=>{const tx=db.transaction(store,'readonly'),r=tx.objectStore(store).get(key);r.onsuccess=()=>resolve(r.result??null);r.onerror=()=>resolve(null)})}
 async function dbPut(store,key,value){const db=await dbPromise;if(!db)return false;return new Promise(resolve=>{const tx=db.transaction(store,'readwrite');tx.objectStore(store).put(value,key);tx.oncomplete=()=>resolve(true);tx.onerror=()=>resolve(false);tx.onabort=()=>resolve(false)})}
 async function dbCount(store){const db=await dbPromise;if(!db)return 0;return new Promise(resolve=>{const tx=db.transaction(store,'readonly'),r=tx.objectStore(store).count();r.onsuccess=()=>resolve(r.result||0);r.onerror=()=>resolve(0)})}
+async function dbKeys(store){const db=await dbPromise;if(!db)return[];return new Promise(resolve=>{const tx=db.transaction(store,'readonly'),r=tx.objectStore(store).getAllKeys();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>resolve([])})}
 
 function questionsFor(surah,verse){return questionIndex.get(`${surah}:${verse}`)||[]}
 function sourcesHtml(items){return(items||[]).map(x=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`:`<span>${esc(x.label)}</span>`).join(' · ')}
@@ -1103,10 +1104,59 @@ const OFFLINE_COMPLETE_KEY='basair-offline-complete-v6-48';
 function offlinePercent(done){return Math.min(100,Math.round(Math.max(0,done)/604*100))}
 function setOfflineProgress(done,prefix='تنزيل'){const percent=offlinePercent(done),full=`${prefix} ${toAr(percent)}٪ — ${toAr(done)}/${toAr(604)}`;setOfflineButton(full,`${toAr(percent)}٪`,'progress')}
 function embeddedMushafImageCount(){if(!Array.isArray(window.BASAIR_EMBEDDED_PAGES))return 0;let count=0;for(let page=1;page<=604;page++)if(typeof window.BASAIR_EMBEDDED_PAGES[page]==='string'&&window.BASAIR_EMBEDDED_PAGES[page].startsWith('data:image/'))count++;return count}
-async function cachedMushafImageCount(){const pages=new Set;for(let page=1;page<=604;page++)if(typeof window.BASAIR_EMBEDDED_PAGES?.[page]==='string')pages.add(page);if(!('caches'in window))return pages.size;const cache=await caches.open(MUSHAF_CACHE),requests=await cache.keys();for(const request of requests){const match=request.url.match(/\/mushaf-pages\/pages-(\d{2,3})\.js(?:$|\?)/);if(match)pages.add(Number(match[1]))}return Math.min(604,pages.size)}
-async function offlineCompletedCount(){const [pages,images]=await Promise.all([dbCount('pages'),cachedMushafImageCount()]);return Math.min(604,pages,images)}
+async function cachedMushafPageSet(cache=null){
+  const pages=new Set;
+  if(!('caches'in window))return pages;
+  cache=cache||await caches.open(MUSHAF_CACHE);
+  const requests=await cache.keys();
+  for(const request of requests){const match=request.url.match(/\/mushaf-pages\/pages-(\d{2,3})\.js(?:$|\?)/);if(match)pages.add(Number(match[1]))}
+  return pages;
+}
+async function offlinePageDataSet(){const keys=await dbKeys('pages');return new Set(keys.map(Number).filter(page=>page>=1&&page<=604))}
+async function offlineInventory(cache=null){const[pageData,pageImages]=await Promise.all([offlinePageDataSet(),cachedMushafPageSet(cache)]);let completed=0;for(let page=1;page<=604;page++)if(pageData.has(page)&&pageImages.has(page))completed++;return{pageData,pageImages,completed}}
+async function offlineCompletedCount(){return(await offlineInventory()).completed}
 async function refreshOfflineState(){const completed=await offlineCompletedCount();if(completed>=604){localStorage.setItem(OFFLINE_COMPLETE_KEY,'yes');setOfflineButton('متاح دون اتصال ✓','جاهز ✓','ready');return}localStorage.removeItem(OFFLINE_COMPLETE_KEY);if(completed>0)setOfflineProgress(completed,'استكمال');else setOfflineButton('تنزيل المصحف','تنزيل')}
-async function downloadOfflinePack(){if(state.downloading)return;let completed=await offlineCompletedCount();if(!completed&&!localStorage.getItem('basair-offline-download-confirmed-v6-48')){const approved=confirm('سيُنزل بصائر صفحات المصحف للعمل دون اتصال (نحو ١١٠ ميغابايت). اترك التطبيق مفتوحًا حتى تصل النسبة إلى ١٠٠٪.');if(!approved)return;localStorage.setItem('basair-offline-download-confirmed-v6-48','yes')}state.downloading=true;const button=$('offlineBtn');button.disabled=true;setOfflineProgress(completed,completed?'استكمال':'تنزيل');try{if(navigator.storage?.persist)await navigator.storage.persist();await loadQpcData();const cache='caches'in window?await caches.open(MUSHAF_CACHE):null;for(let start=1;start<=604;start+=4){const pages=Array.from({length:Math.min(4,605-start)},(_,i)=>start+i);await Promise.all(pages.map(async page=>{await fetchPage(page);const scriptPath=pageScriptPath(page);if(cache){const request=new Request(scriptPath);if(!(await cache.match(request))){const response=await fetch(request);if(!response.ok)throw new Error('page-image-download');await cache.put(request,response.clone())}}await ensureEmbeddedPage(page)}));completed=Math.min(604,start+pages.length-1);setOfflineProgress(completed);for(const page of pages)if(page!==state.page)pageMemory.delete(page)}completed=await offlineCompletedCount();if(completed<604)throw new Error('offline-storage-incomplete');localStorage.setItem(OFFLINE_COMPLETE_KEY,'yes');localStorage.removeItem('basair-offline-complete-v6-43');localStorage.removeItem('basair-offline-complete-v6-47');setOfflineButton('متاح دون اتصال ✓','جاهز ✓','ready');toast('اكتمل التنزيل بنسبة ١٠٠٪ وأصبح المصحف متاحًا دون اتصال',3800)}catch(error){completed=await offlineCompletedCount();setOfflineProgress(completed,'استكمال');toast(`توقف التنزيل عند ${toAr(offlinePercent(completed))}٪؛ يمكنك استكماله عند عودة الاتصال`,4200)}finally{state.downloading=false;button.disabled=false}}
+const offlineWait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function retryOfflineTask(task,attempts=3){let lastError;for(let attempt=1;attempt<=attempts;attempt++){try{return await task()}catch(error){lastError=error;if(attempt<attempts)await offlineWait(attempt*650)}}throw lastError}
+async function ensureOfflinePageData(page){const cached=await dbGet('pages',page);if(cached?.source==='qpc-v4'&&cached.verses?.length)return;const data=buildQpcPage(page);if(!(await dbPut('pages',page,data)))throw new Error('page-data-storage')}
+async function ensureOfflinePageImage(page,cache){const request=new Request(pageScriptPath(page));if(await cache.match(request))return;const response=await fetch(request);if(!response.ok)throw new Error('page-image-download');await cache.put(request,response.clone())}
+async function downloadOfflinePage(page,cache){await Promise.all([retryOfflineTask(()=>ensureOfflinePageData(page)),retryOfflineTask(()=>ensureOfflinePageImage(page,cache))])}
+async function downloadOfflinePack(){
+  if(state.downloading)return;
+  let inventory=await offlineInventory(),completed=inventory.completed;
+  if(!completed&&!localStorage.getItem('basair-offline-download-confirmed-v6-48')){const approved=confirm('سيُنزل بصائر صفحات المصحف للعمل دون اتصال (نحو ١١٠ ميغابايت). اترك التطبيق مفتوحًا حتى تصل النسبة إلى ١٠٠٪.');if(!approved)return;localStorage.setItem('basair-offline-download-confirmed-v6-48','yes')}
+  state.downloading=true;const button=$('offlineBtn');button.disabled=true;setOfflineProgress(completed,completed?'استكمال':'تنزيل');
+  let wakeLock=null;
+  try{
+    if(navigator.storage?.persist)await navigator.storage.persist();
+    try{if(navigator.wakeLock?.request)wakeLock=await navigator.wakeLock.request('screen')}catch{}
+    await loadQpcData();
+    const cache='caches'in window?await caches.open(MUSHAF_CACHE):null;
+    if(!cache)throw new Error('cache-unavailable');
+    inventory=await offlineInventory(cache);completed=inventory.completed;
+    const missing=[];for(let page=1;page<=604;page++)if(!inventory.pageData.has(page)||!inventory.pageImages.has(page))missing.push(page);
+    const concurrency=duoStandalone()?1:2;let failureStreak=0,failed=[];
+    for(let start=0;start<missing.length;start+=concurrency){
+      const batch=missing.slice(start,start+concurrency);
+      const results=await Promise.all(batch.map(async page=>{try{await downloadOfflinePage(page,cache);return{page,ok:true}}catch(error){return{page,ok:false,error}}}));
+      const succeeded=results.filter(item=>item.ok);completed+=succeeded.length;setOfflineProgress(completed);
+      failed.push(...results.filter(item=>!item.ok).map(item=>item.page));
+      failureStreak=succeeded.length?0:failureStreak+results.length;
+      for(const item of succeeded)if(item.page!==state.page)pageMemory.delete(item.page);
+      if(failureStreak>=6)throw new Error('offline-network-stalled');
+      await new Promise(resolve=>requestAnimationFrame(()=>resolve()));
+    }
+    completed=await offlineCompletedCount();
+    if(completed<604||failed.length)throw new Error('offline-storage-incomplete');
+    localStorage.setItem(OFFLINE_COMPLETE_KEY,'yes');localStorage.removeItem('basair-offline-complete-v6-43');localStorage.removeItem('basair-offline-complete-v6-47');
+    setOfflineButton('متاح دون اتصال ✓','جاهز ✓','ready');toast('اكتمل التنزيل بنسبة ١٠٠٪ وأصبح المصحف متاحًا دون اتصال',3800);
+  }catch(error){
+    completed=await offlineCompletedCount();setOfflineProgress(completed,'استكمال');toast('توقف مؤقتًا عند '+toAr(offlinePercent(completed))+'٪؛ اضغط استكمال لمتابعة الصفحات الناقصة',4600);
+  }finally{
+    try{await wakeLock?.release()}catch{}
+    state.downloading=false;button.disabled=false;
+  }
+}
 
 function timedAudioUrl(reader=audioAyahReader,surah=audioSurah){const item=AUDIO_AYAH_READERS[reader]||AUDIO_AYAH_READERS.r5;return`${item.base}${String(surah).padStart(3,'0')}.mp3`}
 function timingUrl(reader=audioAyahReader,surah=audioSurah){const item=AUDIO_AYAH_READERS[reader]||AUDIO_AYAH_READERS.r5;return`${TIMING_API_BASE}?surah=${surah}&read=${item.readId}`}
