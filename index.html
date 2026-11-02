@@ -955,6 +955,7 @@ async function loadPage(restoreLastVerse=false){
   await Promise.all([imagePromise,secondPromise]);
   if(savedVerse){const target=document.querySelector(`.word[data-surah="${state.surah}"][data-verse="${savedVerse}"]`);if(target){selectVerse(state.surah,savedVerse,false);requestAnimationFrame(()=>revealVerseIfNeeded(target))}else localStorage.removeItem('basair-v3-verse')}
   preloadPageImage(state.page-1);preloadPageImage(state.page+(spreadMode()?2:1));
+  if(duoStandalone()&&typeof window.basairPrepareSwipeNeighbors==='function')await window.basairPrepareSwipeNeighbors();
 }
 
 function renderQuestions(){if(!state.verse){$('panelTitle').textContent='المس آية من المصحف';$('questionCount').textContent='';$('questionList').innerHTML='<div class="empty empty-guide"><span class="empty-emblem">ب</span><strong>اختر آية من المصحف</strong><small>المس كلمات الآية أو رقمها الأخضر لتظهر بصائرها وأسئلتها البيانية.</small></div>';return}const all=questionsFor(state.surah,state.verse),term=$('search').value.trim(),items=all.filter(q=>!term||(q.question+' '+q.answer).includes(term));$('panelTitle').textContent=`سورة ${META[state.surah].name} · الآية ${toAr(state.verse)}`;$('questionCount').textContent=all.length?`${toAr(all.length)} ${all.length===1?'سؤال':'أسئلة'}`:'لا توجد أسئلة';$('questionList').innerHTML=items.length?items.map(q=>{const verseNumber=all.indexOf(q)+1;return `<article class="question ${state.open===q.id?'open':''}" data-id="${q.id}"><button class="q-trigger"><span class="q-no">${toAr(verseNumber)}</span><span class="q-text">${esc(q.question)}</span><span>⌄</span></button><div class="q-body"><div class="q-inner"><div class="answer"><span class="label">الجواب</span>${esc(q.answer)}</div><div class="sources"><span class="label">المصادر</span>${sourcesHtml(q.sources)}</div></div></div></article>`}).join(''):'<div class="empty empty-guide"><span class="empty-emblem quiet">◇</span><strong>لا توجد بصائر مرتبطة بهذه الآية حاليًا</strong><small>يمكنك اختيار آية أخرى أو متابعة القراءة.</small></div>';document.querySelectorAll('.q-trigger').forEach(b=>b.addEventListener('click',()=>{const id=b.closest('.question').dataset.id;state.open=state.open===id?null:id;renderQuestions()}))}
@@ -971,7 +972,7 @@ function closeNavigation(){$('navOverlay').classList.remove('open');$('navOverla
 async function jumpToPage(page,preferredSurah=null){const target=Math.max(1,Math.min(604,Number(page)||1));closeNavigation();state.page=target;state.surah=preferredSurah||surahAtPage(target);await loadPage();window.scrollTo({top:0,behavior:'smooth'});toast(`الصفحة ${toAr(target)}`)}
 function activateNavTab(name){document.querySelectorAll('[data-nav-tab]').forEach(button=>button.classList.toggle('active',button.dataset.navTab===name));document.querySelectorAll('[data-nav-pane]').forEach(pane=>pane.classList.toggle('active',pane.dataset.navPane===name))}
 let touchStartX=0,touchStartY=0,touchStartTime=0,touchDragging=false,touchVertical=false;
-function enableSwipeNavigation(){
+function enableStandardSwipeNavigation(){
   const spread=$('mushafSpread');let animating=false,gestureActive=false,gestureDirection=0,gestureRect=null,visual=0,track=null,trackPromise=null,resetTimer=0;const assetPromises=new Map;
   const enhanced=()=>duoStandalone(),baseX=()=>duoStandaloneLandscape()?4:0,reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
   const clearInline=()=>{spread.style.transition='';spread.style.transform='';spread.style.opacity='';spread.style.visibility='';spread.style.willChange=''};
@@ -991,6 +992,102 @@ function enableSwipeNavigation(){
   spread.addEventListener('touchend',async event=>{if(animating)return;if(!touchDragging){gestureActive=false;touchDragging=false;removeTrack();clearInline();return}const touch=event.changedTouches[0],dx=touch.clientX-touchStartX,dy=touch.clientY-touchStartY,duration=Math.max(1,Date.now()-touchStartTime),direction=gestureDirection|| (dx>0?1:-1),allowed=canMove(direction),commit=allowed&&Math.abs(dx)>Math.abs(dy)*1.1&&(Math.abs(dx)>=48||Math.abs(dx)/duration>.34);touchDragging=false;if(!commit){if(trackPromise&&!track)await trackPromise;gestureActive=false;await returnTrack();gestureDirection=0;visual=0;return}if(reduced()){gestureActive=false;removeTrack();await step(direction,'auto');clearInline();gestureDirection=0;visual=0;return}if(trackPromise&&!track)await trackPromise;gestureActive=false;animating=true;if(!track){removeTrack();await step(direction,'auto');reset();animating=false;gestureDirection=0;visual=0;return}const activeTrack=track,width=activeTrack.width,remaining=Math.max(0,width-Math.abs(visual)),transitionDuration=Math.max(170,Math.min(310,remaining/width*260+80)),loadPromise=step(direction,'auto');activeTrack.current.style.transition=`transform ${transitionDuration}ms cubic-bezier(.18,.76,.24,1)`;activeTrack.preview.style.transition=`transform ${transitionDuration}ms cubic-bezier(.18,.76,.24,1)`;activeTrack.current.style.transform=`translate3d(${direction*width}px,0,0)`;activeTrack.preview.style.transform=`translate3d(${direction*width}px,0,0)`;await Promise.all([loadPromise,new Promise(resolve=>setTimeout(resolve,transitionDuration))]);spread.style.transition='none';spread.style.transform=`translate3d(${baseX()}px,0,0)`;spread.style.opacity='0';spread.style.visibility='visible';requestAnimationFrame(()=>{spread.style.transition='opacity 90ms ease';spread.style.opacity='1';activeTrack.preview.style.transition='opacity 90ms ease';activeTrack.preview.style.opacity='0'});await new Promise(resolve=>setTimeout(resolve,100));removeTrack();clearInline();animating=false;gestureDirection=0;visual=0},{passive:true});
   spread.addEventListener('touchcancel',async()=>{gestureActive=false;touchDragging=false;if(trackPromise&&!track)await trackPromise;await returnTrack();animating=false;gestureDirection=0;visual=0},{passive:true});
 }
+function enableDuoSwipeNavigation(){
+  const spread=$('mushafSpread');
+  let animating=false,gestureActive=false,gestureDirection=0,gestureRect=null,visual=0,track=null,resetTimer=0,prepareGeneration=0;
+  const prepared=new Map;
+  const baseX=()=>duoStandaloneLandscape()?4:0,reduced=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const clearInline=()=>{spread.style.transition='';spread.style.transform='';spread.style.opacity='';spread.style.visibility='';spread.style.willChange=''};
+  const pageStep=()=>spreadMode()?2:1;
+  const targetPage=direction=>Math.max(1,Math.min(604,state.page+direction*pageStep()));
+  const canMove=direction=>direction>0?state.page<(spreadMode()?603:604):state.page>1;
+  const reset=(duration=220)=>{clearTimeout(resetTimer);spread.style.visibility='visible';spread.style.willChange='transform,opacity';spread.style.transition='transform '+duration+'ms cubic-bezier(.22,.75,.25,1),opacity '+duration+'ms ease';spread.style.transform='translate3d('+baseX()+'px,0,0)';spread.style.opacity='1';resetTimer=setTimeout(clearInline,duration+30)};
+  const styleOverlay=(node,left,top,width,height,z=24)=>{Object.assign(node.style,{position:'fixed',left:left+'px',top:top+'px',width:width+'px',height:height+'px',margin:'0',zIndex:String(z),pointerEvents:'none',transition:'none',transform:'translate3d(0,0,0)',opacity:'1',visibility:'visible',willChange:'transform,opacity'});node.querySelectorAll('[id]').forEach(item=>item.removeAttribute('id'));document.body.appendChild(node)};
+  const fillArticle=async(article,asset,column)=>{const{page,data,src}=asset;article.style.display='block';article.style.gridColumn=String(column);article.classList.toggle('page-one',page===1);article.classList.toggle('opening-page',page<=2);article.classList.toggle('regular-page',page>2);article.classList.toggle('page-even',page%2===0);article.classList.toggle('page-odd',page%2===1);article.querySelectorAll('.opening-marker-layer').forEach(item=>item.remove());article.querySelectorAll('button').forEach(item=>item.style.display='none');const body=article.querySelector('.mushaf-body');if(body){body.innerHTML='';body.style.setProperty('display','none','important')}const image=article.querySelector('.mushaf-page-image');if(image){image.src=src;try{await image.decode()}catch{}}const first=data.verses?.[0]||{},surahs=[...new Set((data.verses||[]).map(v=>Number(String(v.verse_key).split(':')[0])))],surahText=surahs.map(s=>'سورة '+SURAH_NAMES[s-1]).join(' · '),footerText=surahs.map(s=>SURAH_NAMES[s-1]).join(' · ');const head=article.querySelectorAll('.mushaf-head span');if(head[0])head[0].textContent='الجزء '+toAr(first.juz_number||1);if(head[1])head[1].textContent='الحزب '+toAr(Math.ceil(first.hizb_number||1));if(head[2])head[2].textContent=surahText;const footer=article.querySelector('.mushaf-foot');if(footer){const spans=footer.querySelectorAll('span'),number=footer.querySelector('b');if(spans[0])spans[0].textContent=footerText;if(number)number.textContent=toAr(page)}};
+  const assetsFor=async(direction,pageAtStart,spreadAtStart)=>{const target=Math.max(1,Math.min(604,pageAtStart+direction*(spreadAtStart?2:1))),pages=[target];if(spreadAtStart&&target<604)pages.push(target+1);return Promise.all(pages.map(async page=>{const[data,src]=await Promise.all([fetchPage(page),ensureEmbeddedPage(page)]);return{page,data,src}}))};
+  const discardPrepared=()=>{for(const item of prepared.values())item.node.remove();prepared.clear()};
+  const buildPrepared=async(direction,generation,pageAtStart,spreadAtStart,rect)=>{
+    const assets=await assetsFor(direction,pageAtStart,spreadAtStart);
+    if(generation!==prepareGeneration||state.page!==pageAtStart||spreadMode()!==spreadAtStart)return;
+    const node=spread.cloneNode(true),articles=[...node.querySelectorAll('.mushaf')];
+    await fillArticle(articles[0],assets[0],1);
+    if(spreadAtStart&&assets[1]&&articles[1])await fillArticle(articles[1],assets[1],2);else if(articles[1])articles[1].style.display='none';
+    if(generation!==prepareGeneration||state.page!==pageAtStart||spreadMode()!==spreadAtStart)return;
+    styleOverlay(node,rect.left-direction*rect.width,rect.top,rect.width,rect.height,23);
+    node.style.visibility='hidden';
+    prepared.set(direction,{node,direction,width:rect.width,page:pageAtStart,spread:spreadAtStart});
+  };
+  window.basairPrepareSwipeNeighbors=async()=>{
+    const generation=++prepareGeneration,pageAtStart=state.page,spreadAtStart=spreadMode(),rect=spread.getBoundingClientRect();
+    discardPrepared();
+    const directions=[-1,1].filter(canMove);
+    await Promise.all(directions.map(direction=>buildPrepared(direction,generation,pageAtStart,spreadAtStart,rect).catch(()=>{})));
+  };
+  const beginTrack=direction=>{
+    const ready=prepared.get(direction);
+    if(!ready||ready.page!==state.page||ready.spread!==spreadMode())return false;
+    prepared.delete(direction);
+    const rect=gestureRect||spread.getBoundingClientRect(),current=spread.cloneNode(true);
+    styleOverlay(current,rect.left,rect.top,rect.width,rect.height,24);
+    Object.assign(ready.node.style,{left:(rect.left-direction*rect.width)+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',visibility:'visible',zIndex:'23',transform:'translate3d(0,0,0)',opacity:'1'});
+    spread.style.visibility='hidden';
+    track={current,preview:ready.node,direction,width:rect.width};
+    return true;
+  };
+  const applyVisual=value=>{visual=value;if(track){track.current.style.transform='translate3d('+value+'px,0,0)';track.preview.style.transform='translate3d('+value+'px,0,0)'}};
+  const removeTrack=()=>{track?.current.remove();track?.preview.remove();track=null;spread.style.visibility='visible'};
+  const returnTrack=async()=>{
+    if(!track){reset();return}
+    const duration=190;
+    track.current.style.transition='transform '+duration+'ms cubic-bezier(.22,.75,.25,1)';
+    track.preview.style.transition='transform '+duration+'ms cubic-bezier(.22,.75,.25,1)';
+    track.current.style.transform='translate3d(0,0,0)';
+    track.preview.style.transform='translate3d(0,0,0)';
+    await new Promise(resolve=>setTimeout(resolve,duration+20));
+    removeTrack();clearInline();window.basairPrepareSwipeNeighbors().catch(()=>{});
+  };
+  spread.addEventListener('touchstart',event=>{
+    if(animating||event.touches.length!==1)return;
+    const touch=event.touches[0];
+    touchStartX=touch.clientX;touchStartY=touch.clientY;touchStartTime=Date.now();touchDragging=false;touchVertical=false;gestureActive=true;gestureDirection=0;gestureRect=spread.getBoundingClientRect();visual=0;track=null;clearTimeout(resetTimer);spread.style.willChange='transform';
+  },{passive:true});
+  spread.addEventListener('touchmove',event=>{
+    if(animating||!gestureActive||event.touches.length!==1||touchVertical)return;
+    const touch=event.touches[0],dx=touch.clientX-touchStartX,dy=touch.clientY-touchStartY;
+    if(!touchDragging){
+      if(Math.abs(dx)<9&&Math.abs(dy)<9)return;
+      if(Math.abs(dy)>=Math.abs(dx)){touchVertical=true;gestureActive=false;return}
+      gestureDirection=dx>0?1:-1;
+      if(!canMove(gestureDirection)||!beginTrack(gestureDirection)){touchVertical=true;gestureActive=false;reset();return}
+      touchDragging=true;suppressClickUntil=Date.now()+600;
+    }
+    event.preventDefault();
+    const raw=gestureDirection>0?Math.max(0,dx):Math.min(0,dx),width=gestureRect?.width||innerWidth;
+    applyVisual(Math.sign(raw)*Math.min(Math.abs(raw),width));
+  },{passive:false});
+  spread.addEventListener('touchend',async event=>{
+    if(animating)return;
+    if(!touchDragging){gestureActive=false;removeTrack();clearInline();return}
+    const touch=event.changedTouches[0],dx=touch.clientX-touchStartX,dy=touch.clientY-touchStartY,duration=Math.max(1,Date.now()-touchStartTime),direction=gestureDirection,commit=Math.abs(dx)>Math.abs(dy)*1.1&&(Math.abs(dx)>=48||Math.abs(dx)/duration>.34);
+    touchDragging=false;gestureActive=false;
+    if(!commit){await returnTrack();gestureDirection=0;visual=0;return}
+    if(reduced()){removeTrack();await step(direction,'auto');clearInline();gestureDirection=0;visual=0;return}
+    animating=true;
+    const activeTrack=track,width=activeTrack.width,remaining=Math.max(0,width-Math.abs(visual)),transitionDuration=Math.max(150,Math.min(270,remaining/width*220+65)),loadPromise=step(direction,'auto');
+    activeTrack.current.style.transition='transform '+transitionDuration+'ms cubic-bezier(.18,.76,.24,1)';
+    activeTrack.preview.style.transition='transform '+transitionDuration+'ms cubic-bezier(.18,.76,.24,1)';
+    activeTrack.current.style.transform='translate3d('+(direction*width)+'px,0,0)';
+    activeTrack.preview.style.transform='translate3d('+(direction*width)+'px,0,0)';
+    await Promise.all([loadPromise,new Promise(resolve=>setTimeout(resolve,transitionDuration))]);
+    spread.style.transition='none';spread.style.transform='translate3d('+baseX()+'px,0,0)';spread.style.opacity='0';spread.style.visibility='visible';
+    requestAnimationFrame(()=>{spread.style.transition='opacity 75ms ease';spread.style.opacity='1';activeTrack.preview.style.transition='opacity 75ms ease';activeTrack.preview.style.opacity='0'});
+    await new Promise(resolve=>setTimeout(resolve,85));
+    removeTrack();clearInline();animating=false;gestureDirection=0;visual=0;
+  },{passive:true});
+  spread.addEventListener('touchcancel',async()=>{gestureActive=false;touchDragging=false;await returnTrack();animating=false;gestureDirection=0;visual=0},{passive:true});
+}
+function enableSwipeNavigation(){if(duoStandalone())enableDuoSwipeNavigation();else enableStandardSwipeNavigation()}
+
 const COLOR_THEMES={madinah:'الأبيض الأصلي',night:'الليل',blue:'الصفاء',paper:'الورق',burgundy:'العنابي',green:'أخضر بصائر'};
 function setColorTheme(theme,announce=false){if(!COLOR_THEMES[theme])theme='paper';document.body.classList.remove('night','theme-madinah','theme-night','theme-blue','theme-paper','theme-burgundy','theme-green');document.body.classList.add(`theme-${theme}`);if(theme==='night')document.body.classList.add('night');localStorage.setItem('basair-color-theme',theme);localStorage.setItem('basair-color-theme-v6-43b',theme);localStorage.setItem('basair-color-theme-v6-48',theme);localStorage.setItem('basair-v3-theme',theme==='night'?'night':'light');document.querySelectorAll('[data-theme-choice]').forEach(button=>{const active=button.dataset.themeChoice===theme;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active))});$('themeBtn').title=`ألوان القراءة · ${COLOR_THEMES[theme]}`;if(announce)toast(`تم اختيار ألوان ${COLOR_THEMES[theme]}`)}
 function openThemePicker(){closeQuranSearch();closeNavigation();$('themeOverlay').classList.add('open');$('themeOverlay').setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
