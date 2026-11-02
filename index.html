@@ -1011,11 +1011,12 @@ function enableDuoSwipeNavigation(){
     if(generation!==prepareGeneration||state.page!==pageAtStart||spreadMode()!==spreadAtStart)return;
     const node=spread.cloneNode(true),articles=[...node.querySelectorAll('.mushaf')];
     await fillArticle(articles[0],assets[0],1);
-    if(spreadAtStart&&assets[1]&&articles[1])await fillArticle(articles[1],assets[1],2);else if(articles[1])articles[1].style.display='none';
+    if(spreadAtStart&&assets[1]&&articles[1])await fillArticle(articles[1],assets[1],2);else if(articles[1])articles[1].remove();
     if(generation!==prepareGeneration||state.page!==pageAtStart||spreadMode()!==spreadAtStart)return;
-    styleOverlay(node,rect.left-direction*rect.width,rect.top,rect.width,rect.height,23);
+    const travel=spreadAtStart?rect.width:(spread.querySelector('.mushaf')?.getBoundingClientRect().width||rect.width);
+    styleOverlay(node,rect.left-direction*travel,rect.top,rect.width,rect.height,23);
     node.style.visibility='hidden';
-    prepared.set(direction,{node,direction,width:rect.width,page:pageAtStart,spread:spreadAtStart});
+    prepared.set(direction,{node,direction,width:travel,page:pageAtStart,spread:spreadAtStart});
   };
   window.basairPrepareSwipeNeighbors=async()=>{
     const generation=++prepareGeneration,pageAtStart=state.page,spreadAtStart=spreadMode(),rect=spread.getBoundingClientRect();
@@ -1027,11 +1028,12 @@ function enableDuoSwipeNavigation(){
     const ready=prepared.get(direction);
     if(!ready||ready.page!==state.page||ready.spread!==spreadMode())return false;
     prepared.delete(direction);
-    const rect=gestureRect||spread.getBoundingClientRect(),current=spread.cloneNode(true);
+    const rect=gestureRect||spread.getBoundingClientRect(),current=spread.cloneNode(true),travel=spreadMode()?rect.width:(spread.querySelector('.mushaf')?.getBoundingClientRect().width||rect.width);
+    if(!spreadMode())current.querySelectorAll('.mushaf')[1]?.remove();
     styleOverlay(current,rect.left,rect.top,rect.width,rect.height,24);
-    Object.assign(ready.node.style,{left:(rect.left-direction*rect.width)+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',visibility:'visible',zIndex:'23',transform:'translate3d(0,0,0)',opacity:'1'});
+    Object.assign(ready.node.style,{left:(rect.left-direction*travel)+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px',visibility:'visible',zIndex:'23',transform:'translate3d(0,0,0)',opacity:'1'});
     spread.style.visibility='hidden';
-    track={current,preview:ready.node,direction,width:rect.width};
+    track={current,preview:ready.node,direction,width:travel};
     return true;
   };
   const applyVisual=value=>{visual=value;if(track){track.current.style.transform='translate3d('+value+'px,0,0)';track.preview.style.transform='translate3d('+value+'px,0,0)'}};
