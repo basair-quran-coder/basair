@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'basair-shell-v6-48-31';
+const SHELL_CACHE = 'basair-shell-v6-48-32';
 const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-1';
 const CORE = [
   './',
