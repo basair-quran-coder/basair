@@ -739,7 +739,7 @@ body.night .mushaf.regular-page{background:var(--paper)!important}
   <script src="data/questions-part-10.js"></script>
   <script src="data/questions-part-11.js"></script>
   <script src="data/questions-part-12.js"></script>
-  <script src="data/questions-part-13.js?v=20261103-4"></script>
+  <script src="data/questions-part-13.js?v=20261105-1"></script>
   <script src="data/questions-part-14.js"></script>
   <script src="data/questions-part-15.js"></script>
   <script src="data/questions-part-16.js"></script>
@@ -1206,7 +1206,7 @@ function updateAudioChrome(){const reader=currentAudioReader(),audio=$('quranAud
 function updateQuickAudioToggle(){const audio=$('quranAudio'),button=$('quickAudioToggle');if(!button)return;const active=Boolean(audio.dataset.track||audio.currentSrc||audio.getAttribute('src')),playing=active&&!audio.paused&&!audio.ended;button.hidden=false;button.textContent=playing?'⏸':'▶';button.classList.toggle('playing',playing);const label=playing?'إيقاف التلاوة مؤقتًا':active?'استئناف التلاوة':'فتح المصحف الصوتي';button.setAttribute('aria-label',label);button.title=label}
 function quickAudioAction(){const audio=$('quranAudio');if(audio.dataset.track||audio.currentSrc||audio.getAttribute('src'))toggleAudio();else openAudio()}
 function topAudioAction(){const audio=$('quranAudio');if(!audio.paused&&!audio.ended)audio.pause();else openAudio()}
-function registerServiceWorker(){if(!('serviceWorker'in navigator)||!location.protocol.startsWith('http'))return;navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='BASAIR_UPDATED')return;const key='basair-reloaded-'+event.data.version;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'yes');location.reload()});navigator.serviceWorker.register('service-worker.js?v=6-48-38',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})}
+function registerServiceWorker(){if(!('serviceWorker'in navigator)||!location.protocol.startsWith('http'))return;navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='BASAIR_UPDATED')return;const key='basair-reloaded-'+event.data.version;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'yes');location.reload()});navigator.serviceWorker.register('service-worker.js?v=6-48-39',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})}
 function updateAudioMediaSession(){if('mediaSession'in navigator&&'MediaMetadata'in window){navigator.mediaSession.metadata=new MediaMetadata({title:`سورة ${SURAH_NAMES[audioSurah-1]} — بدءًا من الآية ${toAr(audioAyah)}`,artist:currentAudioReader().name,album:'بصائر — المصحف الصوتي',artwork:[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png'},{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'}]})}}
 function setAudioTrack(autoplay=false){const audio=$('quranAudio'),trackKey=currentAudioTrackKey(),url=currentAudioUrl();if(audio.dataset.track!==trackKey){audio.pause();audio.src=url;audio.dataset.url=url;audio.dataset.track=trackKey;audio.load()}ensureActiveTimings();seekToSelectedAyah(autoplay);updateAudioChrome();updateAudioMediaSession()}
 function toggleAudio(){const audio=$('quranAudio');if(audio.dataset.track!==currentAudioTrackKey()){setAudioTrack(true);return}if(audio.paused)audio.play().catch(()=>toast('تعذر بدء التلاوة؛ تحقق من الاتصال',3000));else audio.pause()}
