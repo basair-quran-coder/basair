@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'basair-shell-v6-48-39';
+const SHELL_CACHE = 'basair-shell-v6-48-40';
 const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-1';
 const CORE = [
   './',
@@ -12,7 +12,7 @@ const CORE = [
   './data/quran-search-part-02.js',
   './data/quran-search-part-03.js',
   './data/quran-search-part-04.js',
-  ...Array.from({ length: 25 }, (_, index) =>
+  ...Array.from({ length: 27 }, (_, index) =>
     `./data/questions-part-${String(index + 1).padStart(2, '0')}.js`
   )
 ];
@@ -96,3 +96,4 @@ self.addEventListener('fetch', event => {
     event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)));
   }
 });
+
