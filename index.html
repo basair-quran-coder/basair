@@ -62,6 +62,7 @@ body.night .mushaf.opening-page::before{box-shadow:0 0 0 12px rgba(24,48,39,.94)
 .mushaf-body{position:absolute!important;z-index:2;top:43px;right:28px;bottom:42px;left:28px;height:auto!important;padding:2px 10px!important;grid-template-rows:repeat(15,minmax(0,1fr))}
 .mushaf-foot{z-index:7;right:25px;left:25px;bottom:16px;height:18px}
 .mushaf-line{grid-column:1;font-size:clamp(.82rem,4.25cqw,2.55rem);line-height:1;transform:none!important}
+.mushaf-line.qpc-line .word{padding:0!important;flex-shrink:0}
 .qpc-glyph{display:inline-block;filter:brightness(0)}
 body.night .qpc-glyph{filter:brightness(0) invert(1)}
 .word.end .qpc-glyph,body.night .word.end .qpc-glyph{filter:none}
@@ -913,10 +914,10 @@ function pageHtml(data,font,useGlyphs=true,page=state.page){
   const rows=layout.length?Math.max(...layout.map(row=>row[0])):15;
   const renderWords=(words,line,centered=false)=>{
     if(!words.length)return;
-    html+=`<div class="mushaf-line${centered?' centered':''}" style="grid-row:${line};font-family:${useGlyphs?`'${font}'`:'UthmanicHafs,AmiriQuran'}">`;
+    html+=`<div class="mushaf-line${centered?' centered':''}${useGlyphs?' qpc-line':''}" style="grid-row:${line};font-family:${useGlyphs?`'${font}'`:'UthmanicHafs,AmiriQuran'}">`;
     for(const w of words){
       const end=w.char_type_name==='end',qcf=useGlyphs,text=qcf?(w.code_v2||''):(w.text_qpc_hafs||w.text||'');
-      html+=`<span class="word ${end?'end':''}" data-surah="${w.surah}" data-verse="${w.verse}" style="font-family:${qcf?`'${font}'`:'UthmanicHafs,AmiriQuran'}"><span class="${qcf?'qpc-glyph':''}">${text}</span>${end&&page>2?marker(w.surah,w.verse):''}</span>`;
+      html+=`<span class="word ${end?'end':''}" data-surah="${w.surah}" data-verse="${w.verse}" style="font-family:${qcf?`'${font}'`:'UthmanicHafs,AmiriQuran'}"><span class="${qcf?'qpc-glyph':''}">${text}</span>${end&&page>2&&useGlyphs?marker(w.surah,w.verse):''}</span>`;
     }
     html+='</div>';
   };
@@ -968,7 +969,7 @@ async function loadSecondPage(){
   $('mushafSecond').classList.toggle('opening-page',page<=2);$('mushafSecond').classList.toggle('regular-page',page>2);$('mushafSecond').classList.toggle('page-even',page%2===0);$('mushafSecond').classList.toggle('page-odd',page%2===1);
   body.innerHTML='<div class="status"><span class="spinner"></span></div>';
   const imagePromise=setPageImage(image,page).catch(()=>{body.innerHTML='<div class="status">تعذر فتح صورة الصفحة المقابلة</div>'});
-  try{const data=await fetchPage(page);renderSecond(data,page,'UthmanicHafs',false)}catch{body.innerHTML=''}
+  try{const[data,font]=await Promise.all([fetchPage(page),loadFont(page)]);renderSecond(data,page,font,true)}catch{try{const data=await fetchPage(page);renderSecond(data,page,'UthmanicHafs',false)}catch{body.innerHTML=''}}
   await imagePromise;
 }
 async function loadPage(restoreLastVerse=false){
@@ -977,7 +978,7 @@ async function loadPage(restoreLastVerse=false){
   const body=$('mushafBody');body.innerHTML='<div class="status"><div><span class="spinner"></span>تُفتح صفحة مصحف المدينة…</div></div>';
   const imagePromise=setPageImage($('mushafPageImage'),state.page).catch(()=>{body.innerHTML='<div class="status"><div><strong>تعذر فتح صورة الصفحة.</strong><br><button class="retry" id="retry">إعادة المحاولة</button></div></div>';setTimeout(()=>$('retry')?.addEventListener('click',loadPage),0)});
   const secondPromise=loadSecondPage();
-  try{const data=await fetchPage(state.page);renderQcf(data,'UthmanicHafs',false)}catch{body.innerHTML=''}
+  try{const[data,font]=await Promise.all([fetchPage(state.page),loadFont(state.page)]);renderQcf(data,font,true)}catch{try{const data=await fetchPage(state.page);renderQcf(data,'UthmanicHafs',false)}catch{body.innerHTML=''}}
   await Promise.all([imagePromise,secondPromise]);
   if(savedVerse){const target=document.querySelector(`.word[data-surah="${state.surah}"][data-verse="${savedVerse}"]`);if(target){selectVerse(state.surah,savedVerse,false);requestAnimationFrame(()=>revealVerseIfNeeded(target))}else localStorage.removeItem('basair-v3-verse')}
   preloadPageImage(state.page-1);preloadPageImage(state.page+(spreadMode()?2:1));
@@ -1208,7 +1209,7 @@ function updateAudioChrome(){const reader=currentAudioReader(),audio=$('quranAud
 function updateQuickAudioToggle(){const audio=$('quranAudio'),button=$('quickAudioToggle');if(!button)return;const active=Boolean(audio.dataset.track||audio.currentSrc||audio.getAttribute('src')),playing=active&&!audio.paused&&!audio.ended;button.hidden=false;button.textContent=playing?'⏸':'▶';button.classList.toggle('playing',playing);const label=playing?'إيقاف التلاوة مؤقتًا':active?'استئناف التلاوة':'فتح المصحف الصوتي';button.setAttribute('aria-label',label);button.title=label}
 function quickAudioAction(){const audio=$('quranAudio');if(audio.dataset.track||audio.currentSrc||audio.getAttribute('src'))toggleAudio();else openAudio()}
 function topAudioAction(){const audio=$('quranAudio');if(!audio.paused&&!audio.ended)audio.pause();else openAudio()}
-function registerServiceWorker(){if(!('serviceWorker'in navigator)||!location.protocol.startsWith('http'))return;navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='BASAIR_UPDATED')return;const key='basair-reloaded-'+event.data.version;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'yes');location.reload()});navigator.serviceWorker.register('service-worker.js?v=6-48-48',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})}
+function registerServiceWorker(){if(!('serviceWorker'in navigator)||!location.protocol.startsWith('http'))return;navigator.serviceWorker.addEventListener('message',event=>{if(event.data?.type!=='BASAIR_UPDATED')return;const key='basair-reloaded-'+event.data.version;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'yes');location.reload()});navigator.serviceWorker.register('service-worker.js?v=6-48-49',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{})}
 function updateAudioMediaSession(){if('mediaSession'in navigator&&'MediaMetadata'in window){navigator.mediaSession.metadata=new MediaMetadata({title:`سورة ${SURAH_NAMES[audioSurah-1]} — بدءًا من الآية ${toAr(audioAyah)}`,artist:currentAudioReader().name,album:'بصائر — المصحف الصوتي',artwork:[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png'},{src:'icons/icon-512.png',sizes:'512x512',type:'image/png'}]})}}
 function setAudioTrack(autoplay=false){const audio=$('quranAudio'),trackKey=currentAudioTrackKey(),url=currentAudioUrl();if(audio.dataset.track!==trackKey){audio.pause();audio.src=url;audio.dataset.url=url;audio.dataset.track=trackKey;audio.load()}ensureActiveTimings();seekToSelectedAyah(autoplay);updateAudioChrome();updateAudioMediaSession()}
 function toggleAudio(){const audio=$('quranAudio');if(audio.dataset.track!==currentAudioTrackKey()){setAudioTrack(true);return}if(audio.paused)audio.play().catch(()=>toast('تعذر بدء التلاوة؛ تحقق من الاتصال',3000));else audio.pause()}
