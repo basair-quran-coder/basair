@@ -1,4 +1,4 @@
-const SHELL_CACHE = 'basair-shell-v6-48-47';
+const SHELL_CACHE = 'basair-shell-v6-48-48';
 const MUSHAF_CACHE = 'basair-mushaf-pages-v6-48-1';
 const CORE = [
   './',
@@ -55,6 +55,10 @@ self.addEventListener('activate', event => {
       .map(key => caches.delete(key)));
     await migrateMushafCaches();
     await self.clients.claim();
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      client.postMessage({ type: 'BASAIR_UPDATED', version: SHELL_CACHE });
+    }
   })());
 });
 
